@@ -1,437 +1,406 @@
+
 <!DOCTYPE html>
 <html lang="ckb" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hama Dev — پرسیار و وەڵام</title>
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #0f172a;
-      color: #f8fafc;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-    }
-    .container { width: 100%; max-width: 680px; }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
-    }
-    h1, h2, h3 { margin: 0 0 8px; }
-    p.sub { margin: 0 0 16px; color: #94a3b8; font-size: 14px; }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      background: #0f172a;
-      padding: 6px;
-      border-radius: 10px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: #94a3b8;
-      cursor: pointer;
-      font-weight: 700;
-    }
-    .tab-btn.active { background: #2563eb; color: #fff; }
-    .field { margin-bottom: 12px; }
-    label { display: block; margin-bottom: 6px; font-size: 14px; color: #cbd5e1; }
-    input, textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 10px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #fff;
-      font-size: 14px;
-    }
-    textarea { min-height: 80px; resize: vertical; }
-    input:focus, textarea:focus { outline: none; border-color: #3b82f6; }
-    .btn {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 10px;
-      background: #2563eb;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .btn-full { width: 100%; }
-    .btn-green { background: #16a34a; }
-    .btn-red { background: #dc2626; }
-    .btn-gray { background: #475569; }
-    .hidden { display: none; }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      background: #eab308;
-      color: #0f172a;
-    }
-    .badge.user { background: #0ea5e9; color: #fff; }
-    .qa-item {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 12px;
-    }
-    .qa-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
-    .qa-q { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
-    .qa-a {
-      background: rgba(22, 163, 74, 0.14);
-      border-right: 3px solid #22c55e;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #dcfce7;
-    }
-    .qa-pending { font-size: 13px; color: #fbbf24; font-style: italic; }
-    .msg {
-      margin-top: 10px;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      display: none;
-    }
-    .msg.err { display: block; background: rgba(220,38,38,0.2); color: #fca5a5; }
-    .msg.ok { display: block; background: rgba(22,163,74,0.2); color: #86efac; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>KurdTok</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
+button,input,textarea{font:inherit}
+header{background:#171717;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.logo{font-size:29px;font-weight:bold;color:#ff3155}
+.logo span{color:white}
+main{max-width:650px;margin:auto;padding:15px}
+.card{background:#191919;border:1px solid #333;border-radius:16px;padding:17px;margin-bottom:15px}
+input,textarea{width:100%;padding:13px;margin:7px 0;background:#292929;border:1px solid #444;color:white;border-radius:10px}
+button{padding:12px;border:0;border-radius:10px;background:#ff3155;color:white;cursor:pointer;font-weight:bold}
+button.secondary{background:#333;color:white}
+.full{width:100%;margin:6px 0}
+.hidden{display:none!important}
+.tabs{display:flex;gap:8px;margin-bottom:15px}
+.tabs button{flex:1}
+.video{width:100%;max-height:500px;background:black;border-radius:12px}
+.small{color:#aaa;font-size:13px}
+.bottom{position:sticky;bottom:0;background:#171717;display:flex;justify-content:space-around;padding:10px}
+.bottom button{background:transparent}
+#status{color:#ff9bad}
+.avatar{width:65px;height:65px;border-radius:50%;background:#ff3155;margin:auto;display:grid;place-items:center;font-size:30px}
+</style>
 </head>
 <body>
-  <div class="container">
 
-    <!-- بەشی چوونە ژوورەوە و دروستکردنی ئەکاونت -->
-    <div class="card" id="authCard">
-      <h1>Hama Dev</h1>
-      <p class="sub">بچۆ ژوورەوە یان بەدڵی خۆت ئەکاونت دروست بکە بۆ پرسیار و وەڵام</p>
+<header>
+ <div class="logo">Kurd<span>Tok</span></div>
+ <button class="secondary" id="logout" hidden>دەرچوون</button>
+</header>
 
-      <div class="tabs">
-        <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">چوونە ژوورەوە</button>
-        <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">دروستکردنی ئەکاونت</button>
-      </div>
+<main>
+<!-- LOGIN -->
+<section id="auth">
+ <div class="card">
+  <div class="logo" style="text-align:center;font-size:50px">K</div>
+  <h2 style="text-align:center">بەخێربێیت بۆ KurdTok ❤️</h2>
+  <p class="small" style="text-align:center">جیهانی ڤیدیۆی کوردی</p>
 
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="field">
-          <label>ناوی بەکارهێنەر</label>
-          <input type="text" id="loginUser" placeholder="بۆ نموونە: hama dev" required />
-        </div>
-        <div class="field">
-          <label>پاسۆرد</label>
-          <input type="password" id="loginPass" placeholder="پاسۆردەکەت بنووسە" required />
-        </div>
-        <button type="submit" class="btn btn-full">چوونە ژوورەوە</button>
-        <div id="loginMsg" class="msg"></div>
-      </form>
-
-      <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-        <div class="field">
-          <label>ناوی ئەکاونت (بەدڵی خۆت)</label>
-          <input type="text" id="regUser" placeholder="ناوێک هەڵبژێرە" required />
-        </div>
-        <div class="field">
-          <label>پاسۆرد</label>
-          <input type="password" id="regPass" placeholder="پاسۆردێک دابنێ" required />
-        </div>
-        <button type="submit" class="btn btn-full">دروستکردنی ئەکاونت</button>
-        <div id="regMsg" class="msg"></div>
-      </form>
-    </div>
-
-    <!-- بەشی سەرەکی دوای چوونە ژوورەوە -->
-    <div id="mainApp" class="hidden">
-      <div class="card">
-        <div class="top-bar">
-          <div>
-            <span id="roleBadge" class="badge">بەکارهێنەر</span>
-            <h2 id="welcomeTitle" style="margin-top:6px;">بەخێربێیت</h2>
-          </div>
-          <button class="btn btn-gray" onclick="logout()">چوونە دەرەوە</button>
-        </div>
-      </div>
-
-      <!-- فۆڕمی ناردنی پرسیار -->
-      <div class="card">
-        <h3>پرسیارێک بنووسە</h3>
-        <p class="sub">پرسیارەکەت بنێرە تا سەرۆک (hama dev) بیبینێت و وەڵامت بداتەوە</p>
-        <form onsubmit="submitQuestion(event)">
-          <div class="field">
-            <textarea id="questionInput" placeholder="پرسیارەکەت لێرە بنووسە..." required></textarea>
-          </div>
-          <button type="submit" class="btn">ناردنی پرسیار</button>
-          <div id="qaStatus" class="msg"></div>
-        </form>
-      </div>
-
-      <!-- لیستی پرسیار و وەڵامەکان -->
-      <div class="card">
-        <div class="top-bar">
-          <h3>پرسیار و وەڵامەکان</h3>
-          <button class="btn btn-gray" onclick="loadQA()">نوێکردنەوە</button>
-        </div>
-        <div id="qaList"></div>
-      </div>
-    </div>
-
+  <div class="tabs">
+   <button id="signupTab">ئەکاونتی نوێ</button>
+   <button class="secondary" id="loginTab">چوونەژوورەوە</button>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  <div id="signupForm">
+   <input id="regName" placeholder="ناوی خۆت">
+   <input id="regEmail" type="email" placeholder="ئیمەیڵ">
+   <input id="regPass" type="password" placeholder="پاسۆرد - لانیکەم 6 پیت">
+   <button class="full" id="signup">دروستکردنی ئەکاونت</button>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBJCXtpmEvKDcLeNuXUpMKOz38oc0AatFM",
-      authDomain: "aizasy-2e889.firebaseapp.com",
-      projectId: "aizasy-2e889",
-      storageBucket: "aizasy-2e889.firebasestorage.app",
-      messagingSenderId: "503323472309",
-      appId: "1:503323472309:android:5887e8b306830445dd29fc"
-    };
+  <div id="loginForm" class="hidden">
+   <input id="email" type="email" placeholder="ئیمەیڵ">
+   <input id="pass" type="password" placeholder="پاسۆرد">
+   <button class="full" id="login">چوونەژوورەوە</button>
+   <button class="secondary full" id="reset">بیرخستنەوەی پاسۆرد</button>
+  </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <hr style="border-color:#333">
+  <input id="guestName" placeholder="ناوت بنووسە">
+  <button class="secondary full" id="guest">چوونەژوورەوە وەک میوان</button>
+  <p id="authStatus"></p>
+ </div>
+</section>
 
-    const OWNER_USER = "hama dev";
-    const OWNER_PASS = "pole 9";
-    const SESSION_KEY = "hamadev_fb_session_v1";
+<!-- MAIN APP -->
+<section id="app" class="hidden">
+ <div class="tabs">
+  <button data-page="feed">🏠 سەرەتا</button>
+  <button data-page="upload">➕ ڤیدیۆ</button>
+  <button data-page="profile">👤 پڕۆفایل</button>
+ </div>
 
-    function getSession() {
-      return JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-    }
+ <section id="feedPage">
+  <div class="card">
+   <h3>🎬 KurdTok For You</h3>
+   <p class="small">ڤیدیۆکانی خەڵکی کوردستان</p>
+  </div>
+  <div id="posts">بارکردن...</div>
+ </section>
 
-    function switchTab(tab) {
-      const isLogin = tab === "login";
-      document.getElementById("tabLogin").classList.toggle("active", isLogin);
-      document.getElementById("tabRegister").classList.toggle("active", !isLogin);
-      document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
-      document.getElementById("registerForm").classList.toggle("hidden", isLogin);
-    }
+ <section id="uploadPage" class="hidden">
+  <div class="card">
+   <h2>➕ بارکردنی ڤیدیۆ</h2>
+   <input id="file" type="file" accept="video/*">
+   <textarea id="caption" placeholder="دەربارەی ڤیدیۆکەت بنووسە..."></textarea>
+   <button class="full" id="upload">بڵاوکردنەوە</button>
+   <progress id="progress" max="100" value="0" style="width:100%"></progress>
+   <p id="uploadStatus"></p>
+  </div>
+ </section>
 
-    function setMsg(id, text, type) {
-      const el = document.getElementById(id);
-      el.className = "msg " + type;
-      el.textContent = text;
-    }
+ <section id="profilePage" class="hidden">
+  <div class="card" style="text-align:center">
+   <div class="avatar">K</div>
+   <h2 id="userName"></h2>
+   <p id="userEmail" class="small"></p>
+   <p id="userType" class="small"></p>
+   <button class="secondary" id="profileLogout">چوونەدەرەوە</button>
+  </div>
+ </section>
+</section>
+</main>
 
-    async function handleRegister(e) {
-      e.preventDefault();
-      const username = document.getElementById("regUser").value.trim();
-      const password = document.getElementById("regPass").value;
+<nav class="bottom hidden" id="bottom">
+ <button data-page="feed">🏠<br>سەرەتا</button>
+ <button data-page="upload">➕<br>ڤیدیۆ</button>
+ <button data-page="profile">👤<br>پڕۆفایل</button>
+</nav>
 
-      if (!username || !password) return;
-      if (username.toLowerCase() === OWNER_USER.toLowerCase()) {
-        return setMsg("regMsg", "ئەم ناوە تایبەتە بە سەرۆک.", "err");
-      }
+<script type="module">
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
-      try {
-        const q = query(collection(db, "users"), where("usernameLower", "==", username.toLowerCase()));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          return setMsg("regMsg", "ئەم ناوە پێشتر تۆمار کراوە.", "err");
-        }
+import {
+getAuth,createUserWithEmailAndPassword,
+signInWithEmailAndPassword,signInAnonymously,
+onAuthStateChanged,signOut,sendPasswordResetEmail,
+updateProfile
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-        await addDoc(collection(db, "users"), {
-          username,
-          usernameLower: username.toLowerCase(),
-          password,
-          createdAt: Date.now()
-        });
+import {
+getFirestore,doc,setDoc,getDoc,collection,
+addDoc,getDocs,query,orderBy,limit,
+serverTimestamp,deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-        localStorage.setItem(SESSION_KEY, JSON.stringify({ username, role: "user" }));
-        setMsg("regMsg", "ئەکاونتەکەت دروست کرا!", "ok");
-        showApp();
-      } catch (err) {
-        setMsg("regMsg", "هەڵە: " + err.message, "err");
-      }
-    }
+import {
+getStorage,ref,uploadBytesResumable,getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      const username = document.getElementById("loginUser").value.trim();
-      const password = document.getElementById("loginPass").value;
+// FIREBASE CONFIG
+const firebaseConfig={
+apiKey:"AIzaSyBJCXtpmEvKDcLeNuXUpMKOz38oc0AatFM",
+authDomain:"aizasy-2e889.firebaseapp.com",
+projectId:"aizasy-2e889",
+storageBucket:"aizasy-2e889.firebasestorage.app",
+messagingSenderId:"503323472309",
+appId:"WEB_APP_ID_لێرە_دابنێ"
+};
 
-      if (username === OWNER_USER && password === OWNER_PASS) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify({
-          username: OWNER_USER,
-          role: "owner"
-        }));
-        return showApp();
-      }
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const storage=getStorage(app);
 
-      try {
-        const q = query(collection(db, "users"), where("usernameLower", "==", username.toLowerCase()));
-        const snap = await getDocs(q);
-        if (snap.empty) {
-          return setMsg("loginMsg", "ناوی بەکارهێنەر یان پاسۆرد هەڵەیە.", "err");
-        }
+const $=id=>document.getElementById(id);
+let user=null;
 
-        const userDoc = snap.docs[0].data();
-        if (userDoc.password !== password) {
-          return setMsg("loginMsg", "ناوی بەکارهێنەر یان پاسۆرد هەڵەیە.", "err");
-        }
+function msg(id,text){$(id).textContent=text}
 
-        localStorage.setItem(SESSION_KEY, JSON.stringify({
-          username: userDoc.username,
-          role: "user"
-        }));
-        showApp();
-      } catch (err) {
-        setMsg("loginMsg", "هەڵە: " + err.message, "err");
-      }
-    }
+// LOGIN TABS
+$("signupTab").onclick=()=>{
+$("signupForm").classList.remove("hidden");
+$("loginForm").classList.add("hidden");
+};
 
-    function logout() {
-      localStorage.removeItem(SESSION_KEY);
-      document.getElementById("mainApp").classList.add("hidden");
-      document.getElementById("authCard").classList.remove("hidden");
-    }
+$("loginTab").onclick=()=>{
+$("loginForm").classList.remove("hidden");
+$("signupForm").classList.add("hidden");
+};
 
-    function showApp() {
-      const session = getSession();
-      if (!session) return;
+// CREATE ACCOUNT
+$("signup").onclick=async()=>{
+const name=$("regName").value.trim();
+const email=$("regEmail").value.trim();
+const password=$("regPass").value;
 
-      document.getElementById("authCard").classList.add("hidden");
-      document.getElementById("mainApp").classList.remove("hidden");
+if(!name||!email||password.length<6){
+msg("authStatus","تکایە ناو و ئیمەیڵ و پاسۆردی دروست بنووسە.");
+return;
+}
 
-      const isOwner = session.role === "owner";
-      const badge = document.getElementById("roleBadge");
-      badge.textContent = isOwner ? "سەرۆک (hama dev)" : "بەکارهێنەر";
-      badge.className = isOwner ? "badge" : "badge user";
-      document.getElementById("welcomeTitle").textContent = `بەخێربێیت، ${session.username}`;
+try{
+const result=await createUserWithEmailAndPassword(auth,email,password);
+await updateProfile(result.user,{displayName:name});
+await setDoc(doc(db,"users",result.user.uid),{
+name,email,guest:false,createdAt:serverTimestamp()
+});
+msg("authStatus","ئەکاونتەکەت دروست کرا ❤️");
+}catch(e){msg("authStatus",e.message)}
+};
 
-      loadQA();
-    }
+// LOGIN
+$("login").onclick=async()=>{
+try{
+await signInWithEmailAndPassword(auth,
+$("email").value.trim(),$("pass").value);
+}catch(e){msg("authStatus","ئیمەیڵ یان پاسۆرد هەڵەیە")}
+};
 
-    async function submitQuestion(e) {
-      e.preventDefault();
-      const session = getSession();
-      const input = document.getElementById("questionInput");
-      const question = input.value.trim();
-      if (!question || !session) return;
+// GUEST
+$("guest").onclick=async()=>{
+const name=$("guestName").value.trim();
+if(!name){msg("authStatus","ناوت بنووسە");return}
+try{
+const result=await signInAnonymously(auth);
+await updateProfile(result.user,{displayName:name});
+await setDoc(doc(db,"users",result.user.uid),{
+name,guest:true,createdAt:serverTimestamp()
+});
+}catch(e){msg("authStatus",e.message)}
+};
 
-      try {
-        await addDoc(collection(db, "questions"), {
-          author: session.username,
-          question,
-          answer: "",
-          createdAt: Date.now()
-        });
+// RESET PASSWORD
+$("reset").onclick=async()=>{
+const email=$("email").value.trim();
+if(!email){msg("authStatus","ئیمەیڵ بنووسە");return}
+try{
+await sendPasswordResetEmail(auth,email);
+msg("authStatus","لینکی گۆڕینی پاسۆرد نێردرا");
+}catch(e){msg("authStatus",e.message)}
+};
 
-        input.value = "";
-        setMsg("qaStatus", "پرسیارەکەت نێردرا!", "ok");
-        loadQA();
-      } catch (err) {
-        setMsg("qaStatus", "نەنێردرا: " + err.message, "err");
-      }
-    }
+// USER SESSION
+onAuthStateChanged(auth,async u=>{
+user=u;
+if(u){
+$("auth").classList.add("hidden");
+$("app").classList.remove("hidden");
+$("bottom").classList.remove("hidden");
+$("logout").hidden=false;
 
-    async function submitAnswer(id) {
-      const session = getSession();
-      if (!session || session.role !== "owner") return;
+let name=u.displayName||"Guest";
+let guest=false;
+try{
+const p=await getDoc(doc(db,"users",u.uid));
+if(p.exists()){
+name=p.data().name||name;
+guest=p.data().guest===true;
+}
+}catch(e){}
+$("userName").textContent=name;
+$("userEmail").textContent=u.email||"";
+$("userType").textContent=guest?"میوان":"بەکارهێنەر";
+loadPosts();
+}else{
+$("auth").classList.remove("hidden");
+$("app").classList.add("hidden");
+$("bottom").classList.add("hidden");
+$("logout").hidden=true;
+}
+});
 
-      const textarea = document.getElementById(`ans-${id}`);
-      const answer = textarea.value.trim();
-      if (!answer) return;
+// LOGOUT
+$("logout").onclick=()=>signOut(auth);
+$("profileLogout").onclick=()=>signOut(auth);
 
-      await updateDoc(doc(db, "questions", id), { answer });
-      loadQA();
-    }
+// NAVIGATION
+function page(name){
+["feed","upload","profile"].forEach(p=>{
+$(p+"Page").classList.toggle("hidden",p!==name);
+});
+}
+document.querySelectorAll("[data-page]").forEach(b=>{
+b.onclick=()=>page(b.dataset.page);
+});
 
-    async function deleteItem(id) {
-      const session = getSession();
-      if (!session || session.role !== "owner") return;
+// UPLOAD
+$("upload").onclick=async()=>{
+const file=$("file").files[0];
+if(!user||!file)return msg("uploadStatus","ڤیدیۆ هەڵبژێرە");
+if(!file.type.startsWith("video/"))return msg("uploadStatus","فایلی ڤیدیۆ هەڵبژێرە");
+if(file.size>100*1024*1024)return msg("uploadStatus","ڤیدیۆکە زۆر گەورەیە");
 
-      await deleteDoc(doc(db, "questions", id));
-      loadQA();
-    }
+$("upload").disabled=true;
+const path="videos/"+user.uid+"/"+Date.now();
+const task=uploadBytesResumable(ref(storage,path),file);
 
-    async function loadQA() {
-      const session = getSession();
-      const isOwner = session && session.role === "owner";
-      const listEl = document.getElementById("qaList");
-      listEl.innerHTML = "<p class='sub'>بارکردنی پرسیارەکان...</p>";
+task.on("state_changed",s=>{
+$("progress").value=s.bytesTransferred/s.totalBytes*100;
+msg("uploadStatus","بارکردن...");
+},e=>{
+msg("uploadStatus",e.message);
+$("upload").disabled=false;
+},async()=>{
+try{
+const url=await getDownloadURL(task.snapshot.ref);
+await addDoc(collection(db,"posts"),{
+uid:user.uid,
+name:user.displayName||"Guest",
+caption:$("caption").value.trim(),
+videoUrl:url,
+createdAt:serverTimestamp()
+});
+msg("uploadStatus","ڤیدیۆکەت بڵاوکرایەوە ❤️");
+$("file").value="";
+$("caption").value="";
+$("progress").value=0;
+page("feed");
+await loadPosts();
+}catch(e){msg("uploadStatus",e.message)}
+$("upload").disabled=false;
+});
+};
 
-      try {
-        const q = query(collection(db, "questions"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+// FEED
+async function loadPosts(){
+const container=$("posts");
+container.textContent="بارکردنی ڤیدیۆکان...";
 
-        if (items.length === 0) {
-          listEl.innerHTML = "<p class='sub'>هیچ پرسیارێک تۆمار نەکراوە.</p>";
-          return;
-        }
+try{
+const q=query(collection(db,"posts"),orderBy("createdAt","desc"),limit(30));
+const snapshot=await getDocs(q);
+container.replaceChildren();
 
-        listEl.innerHTML = items.map(item => `
-          <div class="qa-item">
-            <div class="qa-meta">پرسیاری: <strong>${esc(item.author)}</strong></div>
-            <div class="qa-q">${esc(item.question)}</div>
-            ${
-              item.answer
-                ? `<div class="qa-a"><strong>وەڵامی hama dev:</strong><br/>${esc(item.answer)}</div>`
-                : `<div class="qa-pending">هێشتا وەڵام نەدراوەتەوە...</div>`
-            }
-            ${
-              isOwner
-                ? `
-                  <div style="margin-top:10px;">
-                    <textarea id="ans-${item.id}" placeholder="وەڵامەکەت لێرە بنووسە..." style="min-height:60px; margin-bottom:8px;">${esc(item.answer || "")}</textarea>
-                    <div style="display:flex; gap:8px;">
-                      <button class="btn btn-green" onclick="submitAnswer('${item.id}')">پاشەکەوتکردنی وەڵام</button>
-                      <button class="btn btn-red" onclick="deleteItem('${item.id}')">سڕینەوە</button>
-                    </div>
-                  </div>
-                `
-                : ""
-            }
-          </div>
-        `).join("");
-      } catch (err) {
-        listEl.innerHTML = `<p class='sub'>کێشە لە هێنانی داتاکان: ${esc(err.message)}</p>`;
-      }
-    }
+if(snapshot.empty){
+container.textContent="هێشتا ڤیدیۆ نییە. یەکەم ڤیدیۆ بڵاو بکەرەوە!";
+return;
+}
 
-    function esc(str) {
-      return String(str || "").replace(/[&<>"']/g, m => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      }[m]));
-    }
+for(const item of snapshot.docs){
+const d=item.data();
+const card=document.createElement("div");
+card.className="card";
 
-    // بەستنەوەی فەنکشنەکان بە window چونکە script جۆری moduleـە
-    window.switchTab = switchTab;
-    window.handleLogin = handleLogin;
-    window.handleRegister = handleRegister;
-    window.logout = logout;
-    window.submitQuestion = submitQuestion;
-    window.submitAnswer = submitAnswer;
-    window.deleteItem = deleteItem;
-    window.loadQA = loadQA;
+const title=document.createElement("h3");
+title.textContent="👤 "+(d.name||"KurdTok");
 
-    if (getSession()) {
-      showApp();
-    }
-  </script>
+const video=document.createElement("video");
+video.className="video";
+video.src=d.videoUrl;
+video.controls=true;
+video.playsInline=true;
+video.preload="metadata";
+
+const caption=document.createElement("p");
+caption.textContent=d.caption||"";
+
+const actions=document.createElement("div");
+actions.className="tabs";
+
+const like=document.createElement("button");
+like.className="secondary";
+like.textContent="❤️ لایک";
+
+const comments=document.createElement("button");
+comments.className="secondary";
+comments.textContent="💬 کۆمێنت";
+
+const share=document.createElement("button");
+share.className="secondary";
+share.textContent="↗ هاوبەشکردن";
+
+like.onclick=()=>toggleLike(item.id,like);
+comments.onclick=()=>commentPost(item.id);
+share.onclick=async()=>{
+try{
+await navigator.clipboard.writeText(location.href);
+alert("لینک کۆپی کرا");
+}catch(e){alert("نەتوانرا کۆپی بکرێت")}
+};
+
+actions.append(like,comments,share);
+card.append(title,video,caption,actions);
+container.append(card);
+}
+}catch(e){
+container.textContent="هەڵە: "+e.message;
+}
+}
+
+// LIKE
+async function toggleLike(postId,button){
+try{
+const r=doc(db,"posts",postId,"likes",user.uid);
+const existing=await getDoc(r);
+if(existing.exists()){
+await deleteDoc(r);
+button.textContent="❤️ لایک";
+}else{
+await setDoc(r,{
+uid:user.uid,createdAt:serverTimestamp()
+});
+button.textContent="❤️ لایک کرا";
+}
+}catch(e){alert(e.message)}
+}
+
+// COMMENTS
+async function commentPost(postId){
+const text=prompt("کۆمێنتەکەت بنووسە:");
+if(!text?.trim())return;
+
+try{
+await addDoc(collection(db,"posts",postId,"comments"),{
+uid:user.uid,
+name:user.displayName||"Guest",
+text:text.trim(),
+createdAt:serverTimestamp()
+});
+alert("کۆمێنت نێردرا ❤️");
+}catch(e){alert(e.message)}
+}
+
+</script>
 </body>
 </html>
