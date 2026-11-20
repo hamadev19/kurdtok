@@ -3,433 +3,765 @@
 <html lang="ckb" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" content="#090909">
 <title>KurdTok</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
-header{background:#171717;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-.logo{font-size:29px;font-weight:bold;color:#ff3155}
+body{
+ margin:0;background:#090909;color:white;
+ font-family:Arial,sans-serif;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;border:0}
+header{
+ height:60px;background:#151515;
+ display:flex;align-items:center;
+ justify-content:space-between;
+ padding:0 17px;position:sticky;top:0;z-index:10;
+}
+.logo{font-size:27px;font-weight:bold;color:#ff3155}
 .logo span{color:white}
-main{max-width:650px;margin:auto;padding:15px}
-.card{background:#191919;border:1px solid #333;border-radius:16px;padding:17px;margin-bottom:15px}
-input,textarea{width:100%;padding:13px;margin:7px 0;background:#292929;border:1px solid #444;color:white;border-radius:10px}
-button{padding:12px;border:0;border-radius:10px;background:#ff3155;color:white;cursor:pointer;font-weight:bold}
-button.secondary{background:#333;color:white}
-button:disabled{opacity:.5}
+main{max-width:650px;margin:auto;padding:12px}
+.card{
+ background:#191919;border:1px solid #333;
+ border-radius:15px;padding:17px;margin-bottom:14px;
+}
+input,textarea{
+ width:100%;padding:13px;margin:7px 0;
+ background:#292929;border:1px solid #444;
+ color:white;border-radius:10px;
+}
+button.primary{
+ background:#ff3155;color:white;
+ padding:13px;border-radius:10px;font-weight:bold;
+}
+button.secondary{
+ background:#333;color:white;
+ padding:12px;border-radius:10px;
+}
 .full{width:100%;margin:6px 0}
 .hidden{display:none!important}
-.tabs{display:flex;gap:8px;margin-bottom:15px}
-.tabs button{flex:1}
-.video{width:100%;max-height:500px;background:black;border-radius:12px}
 .small{color:#aaa;font-size:13px}
-.bottom{position:sticky;bottom:0;background:#171717;display:flex;justify-content:space-around;padding:10px}
-.bottom button{background:transparent}
-.avatar{width:65px;height:65px;border-radius:50%;background:#ff3155;margin:auto;display:grid;place-items:center;font-size:30px}
 #authStatus,#uploadStatus{color:#ff9bad;font-size:13px}
-.post-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.post-actions button{background:#333}
+
+/* FOR YOU */
+#feedPage{margin:-12px}
+.feed-heading{
+ display:flex;justify-content:center;gap:25px;
+ padding:13px;background:#111;
+ font-weight:bold;
+}
+.feed-heading span:last-child{color:#ff3155}
+.feed-scroll{
+ height:calc(100dvh - 135px);
+ overflow-y:auto;
+ scroll-snap-type:y mandatory;
+ scrollbar-width:none;
+}
+.feed-scroll::-webkit-scrollbar{display:none}
+.feed-item{
+ height:100%;min-height:450px;
+ position:relative;background:#000;
+ scroll-snap-align:start;
+ scroll-snap-stop:always;
+ overflow:hidden;
+}
+.feed-video{
+ width:100%;height:100%;
+ object-fit:contain;background:#000;
+}
+.feed-info{
+ position:absolute;bottom:22px;right:15px;
+ left:80px;z-index:2;
+ text-shadow:0 2px 5px black;
+}
+.feed-info h3{font-size:17px;margin:5px 0}
+.feed-info p{font-size:14px;line-height:1.5}
+.feed-actions{
+ position:absolute;bottom:40px;left:12px;
+ display:flex;flex-direction:column;
+ gap:18px;align-items:center;z-index:3;
+}
+.action{
+ display:flex;flex-direction:column;
+ align-items:center;gap:4px;
+}
+.action button{
+ width:45px;height:45px;border-radius:50%;
+ background:#333b;color:white;font-size:20px;
+}
+.action span{font-size:12px;color:white}
+.bottom{
+ position:fixed;bottom:0;left:0;right:0;
+ height:65px;background:#151515;
+ display:flex;justify-content:space-around;
+ align-items:center;z-index:20;
+}
+.bottom button{
+ background:transparent;color:white;
+ font-size:13px;line-height:1.7;
+}
+.bottom button.active{color:#ff3155}
+#uploadPage,#profilePage{padding-bottom:75px}
+.avatar{
+ width:75px;height:75px;border-radius:50%;
+ background:#ff3155;margin:auto;
+ display:grid;place-items:center;font-size:30px;
+}
+progress{width:100%;height:12px}
 </style>
 </head>
+
 <body>
 
 <header>
  <div class="logo">Kurd<span>Tok</span></div>
- <button class="secondary" id="logout" hidden>دەرچوون</button>
+ <button id="logout" class="secondary hidden">دەرچوون</button>
 </header>
 
 <main>
+
+<!-- LOGIN -->
 <section id="auth">
  <div class="card">
-  <div class="logo" style="text-align:center;font-size:50px">K</div>
+  <div class="logo" style="text-align:center;font-size:55px">K</div>
   <h2 style="text-align:center">بەخێربێیت بۆ KurdTok ❤️</h2>
-  <p class="small" style="text-align:center">جیهانی ڤیدیۆی کوردی</p>
+  <p class="small" style="text-align:center">
+   جیهانی ڤیدیۆی کوردی
+  </p>
 
-  <div class="tabs">
-   <button id="signupTab">ئەکاونتی نوێ</button>
-   <button class="secondary" id="loginTab">چوونەژوورەوە</button>
-  </div>
+  <button class="primary full" id="signupTab">
+   دروستکردنی ئەکاونت
+  </button>
+  <button class="secondary full" id="loginTab">
+   چوونەژوورەوە
+  </button>
 
   <div id="signupForm">
+   <h3>ئەکاونتی نوێ</h3>
    <input id="regName" placeholder="ناوی خۆت">
    <input id="regEmail" type="email" placeholder="ئیمەیڵ">
-   <input id="regPass" type="password" placeholder="پاسۆرد - لانیکەم 6 پیت">
-   <button class="full" id="signup">دروستکردنی ئەکاونت</button>
+   <input id="regPass" type="password" placeholder="پاسۆرد - 6 پیت یان زیاتر">
+   <button class="primary full" id="signup">
+    دروستکردنی ئەکاونت
+   </button>
   </div>
 
   <div id="loginForm" class="hidden">
+   <h3>چوونەژوورەوە</h3>
    <input id="email" type="email" placeholder="ئیمەیڵ">
    <input id="pass" type="password" placeholder="پاسۆرد">
-   <button class="full" id="login">چوونەژوورەوە</button>
-   <button class="secondary full" id="reset">بیرخستنەوەی پاسۆرد</button>
+   <button class="primary full" id="login">
+    بچۆ ژوورەوە
+   </button>
+   <button class="secondary full" id="reset">
+    بیرخستنەوەی پاسۆرد
+   </button>
   </div>
 
   <hr style="border-color:#333">
-  <input id="guestName" placeholder="ناوی خۆت بۆ چوونەژوورەوە وەک میوان">
-  <button class="secondary full" id="guest">چوونەژوورەوە وەک میوان</button>
+
+  <h3>چوونەژوورەوە وەک میوان</h3>
+  <input id="guestName" placeholder="ناوی خۆت بنووسە">
+  <button class="secondary full" id="guest">
+   چوونەژوورەوە وەک میوان
+  </button>
+
   <p id="authStatus"></p>
  </div>
 </section>
 
+<!-- APP -->
 <section id="app" class="hidden">
- <div class="tabs">
-  <button data-page="feed">🏠 سەرەتا</button>
-  <button data-page="upload">➕ ڤیدیۆ</button>
-  <button data-page="profile">👤 پڕۆفایل</button>
- </div>
 
+ <!-- FOR YOU -->
  <section id="feedPage">
-  <div class="card">
-   <h3>🎬 KurdTok For You</h3>
-   <p class="small">ڤیدیۆکانی کوردستان</p>
+  <div class="feed-heading">
+   <span>دواتر</span>
+   <span>بۆ تۆ</span>
   </div>
-  <div id="posts">بارکردن...</div>
+  <div id="posts" class="feed-scroll">
+   <p style="text-align:center;padding:30px">
+    بارکردنی ڤیدیۆکان...
+   </p>
+  </div>
  </section>
 
+ <!-- UPLOAD -->
  <section id="uploadPage" class="hidden">
   <div class="card">
-   <h2>➕ بارکردنی ڤیدیۆ</h2>
+   <h2>➕ بڵاوکردنەوەی ڤیدیۆ</h2>
+   <p class="small">ڤیدیۆی خۆت لە KurdTok بڵاو بکەرەوە</p>
+
    <input id="file" type="file" accept="video/*">
    <textarea id="caption" placeholder="دەربارەی ڤیدیۆکەت بنووسە..."></textarea>
-   <button class="full" id="upload">بڵاوکردنەوە</button>
-   <progress id="progress" max="100" value="0" style="width:100%"></progress>
+
+   <button id="upload" class="primary full">
+    بڵاوکردنەوە
+   </button>
+
+   <progress id="progress" max="100" value="0"></progress>
    <p id="uploadStatus"></p>
   </div>
  </section>
 
+ <!-- PROFILE -->
  <section id="profilePage" class="hidden">
   <div class="card" style="text-align:center">
    <div class="avatar">K</div>
    <h2 id="userName"></h2>
    <p id="userEmail" class="small"></p>
    <p id="userType" class="small"></p>
-   <button class="secondary" id="profileLogout">چوونەدەرەوە</button>
+   <button class="secondary full" id="profileLogout">
+    چوونەدەرەوە
+   </button>
   </div>
  </section>
+
 </section>
 </main>
 
+<!-- NAVIGATION -->
 <nav class="bottom hidden" id="bottom">
- <button data-page="feed">🏠<br>سەرەتا</button>
- <button data-page="upload">➕<br>ڤیدیۆ</button>
+ <button class="active" data-page="feed">🏠<br>بۆ تۆ</button>
+ <button data-page="upload">➕<br>بڵاوکردنەوە</button>
  <button data-page="profile">👤<br>پڕۆفایل</button>
 </nav>
 
 <script type="module">
+
+// FIREBASE IMPORTS
 import {initializeApp}
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
 import {
-getAuth,createUserWithEmailAndPassword,
-signInWithEmailAndPassword,signInAnonymously,
-onAuthStateChanged,signOut,sendPasswordResetEmail,
-updateProfile
+ getAuth,
+ createUserWithEmailAndPassword,
+ signInWithEmailAndPassword,
+ signInAnonymously,
+ onAuthStateChanged,
+ signOut,
+ sendPasswordResetEmail,
+ updateProfile
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 import {
-getFirestore,doc,setDoc,getDoc,collection,
-addDoc,getDocs,query,orderBy,limit,
-serverTimestamp,deleteDoc
+ getFirestore,
+ doc,setDoc,getDoc,
+ collection,addDoc,getDocs,
+ query,orderBy,limit,
+ serverTimestamp,deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import {
-getStorage,ref,uploadBytesResumable,getDownloadURL
+ getStorage,ref,
+ uploadBytesResumable,getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-// FIREBASE CONFIG - YOUR PROJECT
+// YOUR FIREBASE CONFIG
 const firebaseConfig={
-apiKey:"AIzaSyCq9l5BbPhyXDv4AWITe-R_Mg6jLoQf0C4",
-authDomain:"aizasy-2e889.firebaseapp.com",
-projectId:"aizasy-2e889",
-storageBucket:"aizasy-2e889.firebasestorage.app",
-messagingSenderId:"503323472309",
-appId:"1:503323472309:web:4ce8fd5b24585899dd29fc",
-measurementId:"G-E64YRW9ENL"
+ apiKey:"AIzaSyCq9l5BbPhyXDv4AWITe-R_Mg6jLoQf0C4",
+ authDomain:"aizasy-2e889.firebaseapp.com",
+ projectId:"aizasy-2e889",
+ storageBucket:"aizasy-2e889.firebasestorage.app",
+ messagingSenderId:"503323472309",
+ appId:"1:503323472309:web:4ce8fd5b24585899dd29fc",
+ measurementId:"G-E64YRW9ENL"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const storage=getStorage(app);
+// INITIALIZE
+const firebaseApp=initializeApp(firebaseConfig);
+const auth=getAuth(firebaseApp);
+const db=getFirestore(firebaseApp);
+const storage=getStorage(firebaseApp);
 
 const $=id=>document.getElementById(id);
 let user=null;
+let videoObserver=null;
 
-function msg(id,text){$(id).textContent=text}
+function message(id,text){
+ $(id).textContent=text;
+}
 
-// AUTH TABS
+// AUTH FORMS
 $("signupTab").onclick=()=>{
-$("signupForm").classList.remove("hidden");
-$("loginForm").classList.add("hidden");
+ $("signupForm").classList.remove("hidden");
+ $("loginForm").classList.add("hidden");
 };
 
 $("loginTab").onclick=()=>{
-$("loginForm").classList.remove("hidden");
-$("signupForm").classList.add("hidden");
+ $("loginForm").classList.remove("hidden");
+ $("signupForm").classList.add("hidden");
 };
 
 // CREATE ACCOUNT
 $("signup").onclick=async()=>{
-const name=$("regName").value.trim();
-const email=$("regEmail").value.trim();
-const password=$("regPass").value;
+ const name=$("regName").value.trim();
+ const email=$("regEmail").value.trim();
+ const password=$("regPass").value;
 
-if(!name||!email||password.length<6){
-msg("authStatus","تکایە هەموو زانیارییەکان پڕبکەرەوە.");
-return;
-}
+ if(!name||!email||password.length<6){
+  message("authStatus","تکایە زانیارییەکان بە دروستی بنووسە.");
+  return;
+ }
 
-try{
-const result=await createUserWithEmailAndPassword(auth,email,password);
-await updateProfile(result.user,{displayName:name});
+ $("signup").disabled=true;
 
-await setDoc(doc(db,"users",result.user.uid),{
-name,email,guest:false,
-createdAt:serverTimestamp()
-});
+ try{
+  const result=await createUserWithEmailAndPassword(
+   auth,email,password
+  );
 
-msg("authStatus","ئەکاونتەکەت دروست کرا ❤️");
-}catch(e){msg("authStatus",e.message)}
+  await updateProfile(result.user,{displayName:name});
+
+  await setDoc(doc(db,"users",result.user.uid),{
+   name:name,
+   email:email,
+   guest:false,
+   createdAt:serverTimestamp()
+  });
+
+  message("authStatus","ئەکاونتەکەت دروست کرا ❤️");
+
+ }catch(e){
+  message("authStatus",e.message);
+ }finally{
+  $("signup").disabled=false;
+ }
 };
 
 // LOGIN
 $("login").onclick=async()=>{
-try{
-await signInWithEmailAndPassword(auth,
-$("email").value.trim(),$("pass").value);
-}catch(e){msg("authStatus","ئیمەیڵ یان پاسۆرد هەڵەیە")}
+ try{
+  await signInWithEmailAndPassword(
+   auth,
+   $("email").value.trim(),
+   $("pass").value
+  );
+ }catch(e){
+  message("authStatus","ئیمەیڵ یان پاسۆرد هەڵەیە.");
+ }
 };
 
-// GUEST
+// GUEST LOGIN
 $("guest").onclick=async()=>{
-const name=$("guestName").value.trim();
-if(!name){msg("authStatus","ناوت بنووسە");return}
+ const name=$("guestName").value.trim();
 
-try{
-const result=await signInAnonymously(auth);
-await updateProfile(result.user,{displayName:name});
+ if(!name){
+  message("authStatus","ناوت بنووسە.");
+  return;
+ }
 
-await setDoc(doc(db,"users",result.user.uid),{
-name,guest:true,createdAt:serverTimestamp()
-});
-}catch(e){msg("authStatus",e.message)}
+ try{
+  const result=await signInAnonymously(auth);
+
+  await updateProfile(result.user,{displayName:name});
+
+  await setDoc(doc(db,"users",result.user.uid),{
+   name:name,
+   guest:true,
+   createdAt:serverTimestamp()
+  });
+
+ }catch(e){
+  message("authStatus",e.message);
+ }
 };
 
 // PASSWORD RESET
 $("reset").onclick=async()=>{
-const email=$("email").value.trim();
-if(!email){msg("authStatus","ئیمەیڵ بنووسە");return}
+ const email=$("email").value.trim();
 
-try{
-await sendPasswordResetEmail(auth,email);
-msg("authStatus","لینکی گۆڕینی پاسۆرد نێردرا");
-}catch(e){msg("authStatus",e.message)}
+ if(!email){
+  message("authStatus","ئیمەیڵ بنووسە.");
+  return;
+ }
+
+ try{
+  await sendPasswordResetEmail(auth,email);
+  message("authStatus","لینکی گۆڕینی پاسۆرد نێردرا.");
+ }catch(e){
+  message("authStatus",e.message);
+ }
 };
 
-// AUTH SESSION
+// USER SESSION
 onAuthStateChanged(auth,async u=>{
-user=u;
+ user=u;
 
-if(u){
-$("auth").classList.add("hidden");
-$("app").classList.remove("hidden");
-$("bottom").classList.remove("hidden");
-$("logout").hidden=false;
+ if(!u){
+  $("auth").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  $("bottom").classList.add("hidden");
+  $("logout").classList.add("hidden");
+  return;
+ }
 
-let name=u.displayName||"Guest";
-let guest=false;
+ $("auth").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("bottom").classList.remove("hidden");
+ $("logout").classList.remove("hidden");
 
-try{
-const p=await getDoc(doc(db,"users",u.uid));
-if(p.exists()){
-name=p.data().name||name;
-guest=p.data().guest===true;
-}
-}catch(e){}
+ let name=u.displayName||"Guest";
+ let guest=u.isAnonymous;
 
-$("userName").textContent=name;
-$("userEmail").textContent=u.email||"";
-$("userType").textContent=guest?"میوان":"بەکارهێنەر";
+ try{
+  const profile=await getDoc(doc(db,"users",u.uid));
 
-loadPosts();
-}else{
-$("auth").classList.remove("hidden");
-$("app").classList.add("hidden");
-$("bottom").classList.add("hidden");
-$("logout").hidden=true;
-}
+  if(profile.exists()){
+   name=profile.data().name||name;
+   guest=profile.data().guest===true;
+  }
+ }catch(e){
+  console.error(e);
+ }
+
+ $("userName").textContent=name;
+ $("userEmail").textContent=u.email||"";
+ $("userType").textContent=guest?"میوان":"ئەکاونتی بەکارهێنەر";
+
+ page("feed");
+ loadPosts();
 });
 
 // LOGOUT
-$("logout").onclick=()=>signOut(auth);
-$("profileLogout").onclick=()=>signOut(auth);
-
-// NAVIGATION
-function page(name){
-["feed","upload","profile"].forEach(p=>{
-$(p+"Page").classList.toggle("hidden",p!==name);
-});
+async function logout(){
+ try{
+  await signOut(auth);
+ }catch(e){
+  alert(e.message);
+ }
 }
+$("logout").onclick=logout;
+$("profileLogout").onclick=logout;
+
+// PAGE NAVIGATION
+function page(name){
+ ["feed","upload","profile"].forEach(p=>{
+  $(p+"Page").classList.toggle("hidden",p!==name);
+ });
+
+ document.querySelectorAll("[data-page]").forEach(b=>{
+  b.classList.toggle("active",b.dataset.page===name);
+ });
+
+ if(name==="feed"){
+  setTimeout(()=>playVisibleVideo(),100);
+ }
+}
+
 document.querySelectorAll("[data-page]").forEach(b=>{
-b.onclick=()=>page(b.dataset.page);
+ b.onclick=()=>page(b.dataset.page);
 });
 
 // UPLOAD VIDEO
 $("upload").onclick=async()=>{
-const file=$("file").files[0];
-if(!user||!file){
-msg("uploadStatus","ڤیدیۆیەک هەڵبژێرە.");
-return;
-}
+ if(!user){
+  message("uploadStatus","سەرەتا بچۆ ژوورەوە.");
+  return;
+ }
 
-if(!file.type.startsWith("video/")){
-msg("uploadStatus","فایلی ڤیدیۆ هەڵبژێرە.");
-return;
-}
+ const file=$("file").files[0];
+ const caption=$("caption").value.trim();
 
-if(file.size>100*1024*1024){
-msg("uploadStatus","قەبارەی ڤیدیۆ نابێت لە 100MB زیاتر بێت.");
-return;
-}
+ if(!file){
+  message("uploadStatus","تکایە ڤیدیۆیەک هەڵبژێرە.");
+  return;
+ }
 
-$("upload").disabled=true;
+ if(!file.type.startsWith("video/")){
+  message("uploadStatus","تەنها فایلی ڤیدیۆ ڕێگەپێدراوە.");
+  return;
+ }
 
-try{
-const path="videos/"+user.uid+"/"+Date.now();
-const task=uploadBytesResumable(ref(storage,path),file);
+ if(file.size>100*1024*1024){
+  message("uploadStatus","قەبارەی ڤیدیۆ نابێت لە 100MB زیاتر بێت.");
+  return;
+ }
 
-task.on("state_changed",s=>{
-$("progress").value=s.bytesTransferred/s.totalBytes*100;
-msg("uploadStatus","بارکردن...");
-},e=>{
-msg("uploadStatus",e.message);
-$("upload").disabled=false;
-},async()=>{
-try{
-const url=await getDownloadURL(task.snapshot.ref);
+ $("upload").disabled=true;
+ message("uploadStatus","ئامادەکردنی بارکردن...");
+ $("progress").value=0;
 
-await addDoc(collection(db,"posts"),{
-uid:user.uid,
-name:user.displayName||"Guest",
-caption:$("caption").value.trim(),
-videoUrl:url,
-createdAt:serverTimestamp()
-});
+ try{
+  const path="videos/"+user.uid+"/"+Date.now();
+  const storageRef=ref(storage,path);
 
-msg("uploadStatus","ڤیدیۆکەت بڵاوکرایەوە ❤️");
-$("file").value="";
-$("caption").value="";
-$("progress").value=0;
-page("feed");
-await loadPosts();
-}catch(e){msg("uploadStatus",e.message)}
-$("upload").disabled=false;
-});
-}catch(e){
-msg("uploadStatus",e.message);
-$("upload").disabled=false;
-}
+  const task=uploadBytesResumable(storageRef,file);
+
+  task.on("state_changed",snapshot=>{
+   const percent=
+    snapshot.bytesTransferred/snapshot.totalBytes*100;
+
+   $("progress").value=percent;
+   message("uploadStatus","بارکردن: "+Math.round(percent)+"%");
+  },error=>{
+   message("uploadStatus",error.message);
+   $("upload").disabled=false;
+  },async()=>{
+   try{
+    const url=await getDownloadURL(task.snapshot.ref);
+
+    await addDoc(collection(db,"posts"),{
+     uid:user.uid,
+     name:user.displayName||"KurdTok User",
+     caption:caption,
+     videoUrl:url,
+     storagePath:path,
+     createdAt:serverTimestamp()
+    });
+
+    message("uploadStatus","ڤیدیۆکەت بڵاوکرایەوە ❤️");
+
+    $("file").value="";
+    $("caption").value="";
+    $("progress").value=0;
+
+    await loadPosts();
+    page("feed");
+
+   }catch(e){
+    message("uploadStatus",e.message);
+   }finally{
+    $("upload").disabled=false;
+   }
+  });
+
+ }catch(e){
+  message("uploadStatus",e.message);
+  $("upload").disabled=false;
+ }
 };
 
-// LOAD VIDEOS
+// LOAD FOR YOU FEED
 async function loadPosts(){
-const container=$("posts");
-container.textContent="بارکردنی ڤیدیۆکان...";
+ const container=$("posts");
 
-try{
-const q=query(collection(db,"posts"),
-orderBy("createdAt","desc"),limit(30));
+ if(videoObserver){
+  videoObserver.disconnect();
+  videoObserver=null;
+ }
 
-const snapshot=await getDocs(q);
-container.replaceChildren();
+ container.replaceChildren();
 
-if(snapshot.empty){
-container.textContent="هێشتا ڤیدیۆ نییە. یەکەم ڤیدیۆ بڵاو بکەرەوە!";
-return;
+ const loading=document.createElement("p");
+ loading.textContent="بارکردنی ڤیدیۆکان...";
+ loading.style.textAlign="center";
+ container.append(loading);
+
+ try{
+  const postsQuery=query(
+   collection(db,"posts"),
+   orderBy("createdAt","desc"),
+   limit(50)
+  );
+
+  const snapshot=await getDocs(postsQuery);
+  container.replaceChildren();
+
+  if(snapshot.empty){
+   const empty=document.createElement("p");
+   empty.textContent="هێشتا ڤیدیۆ نییە. یەکەم ڤیدیۆ بڵاو بکەرەوە ❤️";
+   empty.style.textAlign="center";
+   empty.style.padding="30px";
+   container.append(empty);
+   return;
+  }
+
+  snapshot.docs.forEach(item=>{
+   const d=item.data();
+
+   const card=document.createElement("article");
+   card.className="feed-item";
+
+   const video=document.createElement("video");
+   video.className="feed-video";
+   video.src=d.videoUrl;
+   video.playsInline=true;
+   video.muted=true;
+   video.loop=true;
+   video.preload="metadata";
+
+   const info=document.createElement("div");
+   info.className="feed-info";
+
+   const name=document.createElement("h3");
+   name.textContent="@"+(d.name||"KurdTok");
+
+   const caption=document.createElement("p");
+   caption.textContent=d.caption||"";
+
+   info.append(name,caption);
+
+   const actions=document.createElement("div");
+   actions.className="feed-actions";
+
+   // LIKE
+   const likeWrap=document.createElement("div");
+   likeWrap.className="action";
+
+   const like=document.createElement("button");
+   like.textContent="❤️";
+
+   const likeText=document.createElement("span");
+   likeText.textContent="لایک";
+
+   like.onclick=async()=>{
+    await toggleLike(item.id,like,likeText);
+   };
+
+   likeWrap.append(like,likeText);
+
+   // COMMENTS
+   const commentWrap=document.createElement("div");
+   commentWrap.className="action";
+
+   const comment=document.createElement("button");
+   comment.textContent="💬";
+
+   const commentText=document.createElement("span");
+   commentText.textContent="کۆمێنت";
+
+   comment.onclick=()=>commentPost(item.id);
+
+   commentWrap.append(comment,commentText);
+
+   // SHARE
+   const shareWrap=document.createElement("div");
+   shareWrap.className="action";
+
+   const share=document.createElement("button");
+   share.textContent="↗";
+
+   const shareText=document.createElement("span");
+   shareText.textContent="هاوبەش";
+
+   share.onclick=async()=>{
+    try{
+     await navigator.clipboard.writeText(
+      location.href.split("#")[0]+"#"+item.id
+     );
+     shareText.textContent="کۆپی کرا";
+    }catch(e){
+     alert("نەتوانرا لینک کۆپی بکرێت.");
+    }
+   };
+
+   shareWrap.append(share,shareText);
+
+   actions.append(likeWrap,commentWrap,shareWrap);
+
+   video.onclick=()=>{
+    if(video.paused){
+     video.play().catch(()=>{});
+    }else{
+     video.pause();
+    }
+   };
+
+   card.append(video,info,actions);
+   container.append(card);
+  });
+
+  setupVideoObserver();
+
+ }catch(e){
+  container.textContent="هەڵە لە بارکردنی ڤیدیۆکان: "+e.message;
+ }
 }
 
-for(const item of snapshot.docs){
-const d=item.data();
-const card=document.createElement("div");
-card.className="card";
+// AUTO PLAY VISIBLE VIDEO
+function setupVideoObserver(){
+ if(videoObserver)videoObserver.disconnect();
 
-const title=document.createElement("h3");
-title.textContent="👤 "+(d.name||"KurdTok");
+ videoObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+   const video=entry.target;
 
-const video=document.createElement("video");
-video.className="video";
-video.src=d.videoUrl;
-video.controls=true;
-video.playsInline=true;
-video.preload="metadata";
+   if(entry.isIntersecting){
+    video.play().catch(()=>{});
+   }else{
+    video.pause();
+   }
+  });
+ },{
+  root:$("posts"),
+  threshold:0.7
+ });
 
-const caption=document.createElement("p");
-caption.textContent=d.caption||"";
-
-const actions=document.createElement("div");
-actions.className="post-actions";
-
-const like=document.createElement("button");
-like.textContent="❤️ لایک";
-
-const comments=document.createElement("button");
-comments.textContent="💬 کۆمێنت";
-
-const share=document.createElement("button");
-share.textContent="↗ هاوبەشکردن";
-
-like.onclick=()=>toggleLike(item.id,like);
-comments.onclick=()=>commentPost(item.id);
-
-share.onclick=async()=>{
-try{
-await navigator.clipboard.writeText(location.href+"#"+item.id);
-alert("لینک کۆپی کرا");
-}catch(e){alert("نەتوانرا لینک کۆپی بکرێت")}
-};
-
-actions.append(like,comments,share);
-card.append(title,video,caption,actions);
-container.append(card);
-}
-}catch(e){
-container.textContent="هەڵە: "+e.message;
-}
+ document.querySelectorAll(".feed-video").forEach(video=>{
+  videoObserver.observe(video);
+ });
 }
 
-// LIKES
-async function toggleLike(postId,button){
-try{
-const r=doc(db,"posts",postId,"likes",user.uid);
-const existing=await getDoc(r);
+function playVisibleVideo(){
+ const container=$("posts");
+ const videos=container.querySelectorAll("video");
 
-if(existing.exists()){
-await deleteDoc(r);
-button.textContent="❤️ لایک";
-}else{
-await setDoc(r,{
-uid:user.uid,createdAt:serverTimestamp()
-});
-button.textContent="❤️ لایک کرا";
-}
-}catch(e){alert(e.message)}
+ videos.forEach(video=>{
+  const rect=video.getBoundingClientRect();
+  const visible=rect.top>=0&&rect.bottom<=window.innerHeight;
+
+  if(visible&& !container.closest(".hidden")){
+   video.play().catch(()=>{});
+  }else{
+   video.pause();
+  }
+ });
 }
 
-// COMMENTS
+// LIKE SYSTEM
+async function toggleLike(postId,button,label){
+ if(!user)return;
+
+ try{
+  const likeRef=doc(db,"posts",postId,"likes",user.uid);
+  const existing=await getDoc(likeRef);
+
+  if(existing.exists()){
+   await deleteDoc(likeRef);
+   button.textContent="❤️";
+   label.textContent="لایک";
+  }else{
+   await setDoc(likeRef,{
+    uid:user.uid,
+    createdAt:serverTimestamp()
+   });
+
+   button.textContent="❤️";
+   label.textContent="لایک کرا";
+  }
+ }catch(e){
+  alert("هەڵە لە لایک: "+e.message);
+ }
+}
+
+// COMMENTS SYSTEM
 async function commentPost(postId){
-const text=prompt("کۆمێنتەکەت بنووسە:");
-if(!text||!text.trim())return;
+ if(!user)return;
 
-try{
-await addDoc(collection(db,"posts",postId,"comments"),{
-uid:user.uid,
-name:user.displayName||"Guest",
-text:text.trim(),
-createdAt:serverTimestamp()
-});
-alert("کۆمێنت نێردرا ❤️");
-}catch(e){alert(e.message)}
+ const text=prompt("کۆمێنتەکەت بنووسە:");
+
+ if(!text||!text.trim())return;
+
+ try{
+  await addDoc(
+   collection(db,"posts",postId,"comments"),
+   {
+    uid:user.uid,
+    name:user.displayName||"Guest",
+    text:text.trim(),
+    createdAt:serverTimestamp()
+   }
+  );
+
+  alert("کۆمێنتەکەت نێردرا ❤️");
+
+ }catch(e){
+  alert("هەڵە لە کۆمێنت: "+e.message);
+ }
 }
 
 </script>
