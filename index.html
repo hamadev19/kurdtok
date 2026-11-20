@@ -9,7 +9,6 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
-button,input,textarea{font:inherit}
 header{background:#171717;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
 .logo{font-size:29px;font-weight:bold;color:#ff3155}
 .logo span{color:white}
@@ -18,6 +17,7 @@ main{max-width:650px;margin:auto;padding:15px}
 input,textarea{width:100%;padding:13px;margin:7px 0;background:#292929;border:1px solid #444;color:white;border-radius:10px}
 button{padding:12px;border:0;border-radius:10px;background:#ff3155;color:white;cursor:pointer;font-weight:bold}
 button.secondary{background:#333;color:white}
+button:disabled{opacity:.5}
 .full{width:100%;margin:6px 0}
 .hidden{display:none!important}
 .tabs{display:flex;gap:8px;margin-bottom:15px}
@@ -26,8 +26,10 @@ button.secondary{background:#333;color:white}
 .small{color:#aaa;font-size:13px}
 .bottom{position:sticky;bottom:0;background:#171717;display:flex;justify-content:space-around;padding:10px}
 .bottom button{background:transparent}
-#status{color:#ff9bad}
 .avatar{width:65px;height:65px;border-radius:50%;background:#ff3155;margin:auto;display:grid;place-items:center;font-size:30px}
+#authStatus,#uploadStatus{color:#ff9bad;font-size:13px}
+.post-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.post-actions button{background:#333}
 </style>
 </head>
 <body>
@@ -38,7 +40,6 @@ button.secondary{background:#333;color:white}
 </header>
 
 <main>
-<!-- LOGIN -->
 <section id="auth">
  <div class="card">
   <div class="logo" style="text-align:center;font-size:50px">K</div>
@@ -65,13 +66,12 @@ button.secondary{background:#333;color:white}
   </div>
 
   <hr style="border-color:#333">
-  <input id="guestName" placeholder="ناوت بنووسە">
+  <input id="guestName" placeholder="ناوی خۆت بۆ چوونەژوورەوە وەک میوان">
   <button class="secondary full" id="guest">چوونەژوورەوە وەک میوان</button>
   <p id="authStatus"></p>
  </div>
 </section>
 
-<!-- MAIN APP -->
 <section id="app" class="hidden">
  <div class="tabs">
   <button data-page="feed">🏠 سەرەتا</button>
@@ -82,7 +82,7 @@ button.secondary{background:#333;color:white}
  <section id="feedPage">
   <div class="card">
    <h3>🎬 KurdTok For You</h3>
-   <p class="small">ڤیدیۆکانی خەڵکی کوردستان</p>
+   <p class="small">ڤیدیۆکانی کوردستان</p>
   </div>
   <div id="posts">بارکردن...</div>
  </section>
@@ -137,14 +137,15 @@ import {
 getStorage,ref,uploadBytesResumable,getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-// FIREBASE CONFIG
+// FIREBASE CONFIG - YOUR PROJECT
 const firebaseConfig={
-apiKey:"AIzaSyBJCXtpmEvKDcLeNuXUpMKOz38oc0AatFM",
+apiKey:"AIzaSyCq9l5BbPhyXDv4AWITe-R_Mg6jLoQf0C4",
 authDomain:"aizasy-2e889.firebaseapp.com",
 projectId:"aizasy-2e889",
 storageBucket:"aizasy-2e889.firebasestorage.app",
 messagingSenderId:"503323472309",
-appId:"WEB_APP_ID_لێرە_دابنێ"
+appId:"1:503323472309:web:4ce8fd5b24585899dd29fc",
+measurementId:"G-E64YRW9ENL"
 };
 
 const app=initializeApp(firebaseConfig);
@@ -157,7 +158,7 @@ let user=null;
 
 function msg(id,text){$(id).textContent=text}
 
-// LOGIN TABS
+// AUTH TABS
 $("signupTab").onclick=()=>{
 $("signupForm").classList.remove("hidden");
 $("loginForm").classList.add("hidden");
@@ -175,16 +176,19 @@ const email=$("regEmail").value.trim();
 const password=$("regPass").value;
 
 if(!name||!email||password.length<6){
-msg("authStatus","تکایە ناو و ئیمەیڵ و پاسۆردی دروست بنووسە.");
+msg("authStatus","تکایە هەموو زانیارییەکان پڕبکەرەوە.");
 return;
 }
 
 try{
 const result=await createUserWithEmailAndPassword(auth,email,password);
 await updateProfile(result.user,{displayName:name});
+
 await setDoc(doc(db,"users",result.user.uid),{
-name,email,guest:false,createdAt:serverTimestamp()
+name,email,guest:false,
+createdAt:serverTimestamp()
 });
+
 msg("authStatus","ئەکاونتەکەت دروست کرا ❤️");
 }catch(e){msg("authStatus",e.message)}
 };
@@ -201,28 +205,32 @@ $("email").value.trim(),$("pass").value);
 $("guest").onclick=async()=>{
 const name=$("guestName").value.trim();
 if(!name){msg("authStatus","ناوت بنووسە");return}
+
 try{
 const result=await signInAnonymously(auth);
 await updateProfile(result.user,{displayName:name});
+
 await setDoc(doc(db,"users",result.user.uid),{
 name,guest:true,createdAt:serverTimestamp()
 });
 }catch(e){msg("authStatus",e.message)}
 };
 
-// RESET PASSWORD
+// PASSWORD RESET
 $("reset").onclick=async()=>{
 const email=$("email").value.trim();
 if(!email){msg("authStatus","ئیمەیڵ بنووسە");return}
+
 try{
 await sendPasswordResetEmail(auth,email);
 msg("authStatus","لینکی گۆڕینی پاسۆرد نێردرا");
 }catch(e){msg("authStatus",e.message)}
 };
 
-// USER SESSION
+// AUTH SESSION
 onAuthStateChanged(auth,async u=>{
 user=u;
+
 if(u){
 $("auth").classList.add("hidden");
 $("app").classList.remove("hidden");
@@ -231,6 +239,7 @@ $("logout").hidden=false;
 
 let name=u.displayName||"Guest";
 let guest=false;
+
 try{
 const p=await getDoc(doc(db,"users",u.uid));
 if(p.exists()){
@@ -238,9 +247,11 @@ name=p.data().name||name;
 guest=p.data().guest===true;
 }
 }catch(e){}
+
 $("userName").textContent=name;
 $("userEmail").textContent=u.email||"";
 $("userType").textContent=guest?"میوان":"بەکارهێنەر";
+
 loadPosts();
 }else{
 $("auth").classList.remove("hidden");
@@ -264,14 +275,27 @@ document.querySelectorAll("[data-page]").forEach(b=>{
 b.onclick=()=>page(b.dataset.page);
 });
 
-// UPLOAD
+// UPLOAD VIDEO
 $("upload").onclick=async()=>{
 const file=$("file").files[0];
-if(!user||!file)return msg("uploadStatus","ڤیدیۆ هەڵبژێرە");
-if(!file.type.startsWith("video/"))return msg("uploadStatus","فایلی ڤیدیۆ هەڵبژێرە");
-if(file.size>100*1024*1024)return msg("uploadStatus","ڤیدیۆکە زۆر گەورەیە");
+if(!user||!file){
+msg("uploadStatus","ڤیدیۆیەک هەڵبژێرە.");
+return;
+}
+
+if(!file.type.startsWith("video/")){
+msg("uploadStatus","فایلی ڤیدیۆ هەڵبژێرە.");
+return;
+}
+
+if(file.size>100*1024*1024){
+msg("uploadStatus","قەبارەی ڤیدیۆ نابێت لە 100MB زیاتر بێت.");
+return;
+}
 
 $("upload").disabled=true;
+
+try{
 const path="videos/"+user.uid+"/"+Date.now();
 const task=uploadBytesResumable(ref(storage,path),file);
 
@@ -284,6 +308,7 @@ $("upload").disabled=false;
 },async()=>{
 try{
 const url=await getDownloadURL(task.snapshot.ref);
+
 await addDoc(collection(db,"posts"),{
 uid:user.uid,
 name:user.displayName||"Guest",
@@ -291,6 +316,7 @@ caption:$("caption").value.trim(),
 videoUrl:url,
 createdAt:serverTimestamp()
 });
+
 msg("uploadStatus","ڤیدیۆکەت بڵاوکرایەوە ❤️");
 $("file").value="";
 $("caption").value="";
@@ -300,15 +326,21 @@ await loadPosts();
 }catch(e){msg("uploadStatus",e.message)}
 $("upload").disabled=false;
 });
+}catch(e){
+msg("uploadStatus",e.message);
+$("upload").disabled=false;
+}
 };
 
-// FEED
+// LOAD VIDEOS
 async function loadPosts(){
 const container=$("posts");
 container.textContent="بارکردنی ڤیدیۆکان...";
 
 try{
-const q=query(collection(db,"posts"),orderBy("createdAt","desc"),limit(30));
+const q=query(collection(db,"posts"),
+orderBy("createdAt","desc"),limit(30));
+
 const snapshot=await getDocs(q);
 container.replaceChildren();
 
@@ -336,27 +368,25 @@ const caption=document.createElement("p");
 caption.textContent=d.caption||"";
 
 const actions=document.createElement("div");
-actions.className="tabs";
+actions.className="post-actions";
 
 const like=document.createElement("button");
-like.className="secondary";
 like.textContent="❤️ لایک";
 
 const comments=document.createElement("button");
-comments.className="secondary";
 comments.textContent="💬 کۆمێنت";
 
 const share=document.createElement("button");
-share.className="secondary";
 share.textContent="↗ هاوبەشکردن";
 
 like.onclick=()=>toggleLike(item.id,like);
 comments.onclick=()=>commentPost(item.id);
+
 share.onclick=async()=>{
 try{
-await navigator.clipboard.writeText(location.href);
+await navigator.clipboard.writeText(location.href+"#"+item.id);
 alert("لینک کۆپی کرا");
-}catch(e){alert("نەتوانرا کۆپی بکرێت")}
+}catch(e){alert("نەتوانرا لینک کۆپی بکرێت")}
 };
 
 actions.append(like,comments,share);
@@ -368,11 +398,12 @@ container.textContent="هەڵە: "+e.message;
 }
 }
 
-// LIKE
+// LIKES
 async function toggleLike(postId,button){
 try{
 const r=doc(db,"posts",postId,"likes",user.uid);
 const existing=await getDoc(r);
+
 if(existing.exists()){
 await deleteDoc(r);
 button.textContent="❤️ لایک";
@@ -388,7 +419,7 @@ button.textContent="❤️ لایک کرا";
 // COMMENTS
 async function commentPost(postId){
 const text=prompt("کۆمێنتەکەت بنووسە:");
-if(!text?.trim())return;
+if(!text||!text.trim())return;
 
 try{
 await addDoc(collection(db,"posts",postId,"comments"),{
