@@ -1,769 +1,2513 @@
-
+```html
 <!DOCTYPE html>
-<html lang="ckb" dir="rtl">
+<html lang="ckb" dir="rtl" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<meta name="theme-color" content="#090909">
-<title>KurdTok</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#09090b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="KurdTok" />
+  <title>KurdTok | کوردتۆک</title>
 
-<style>
-*{box-sizing:border-box}
-body{
- margin:0;background:#090909;color:white;
- font-family:Arial,sans-serif;
-}
-button,input,textarea{font:inherit}
-button{cursor:pointer;border:0}
-header{
- height:60px;background:#151515;
- display:flex;align-items:center;
- justify-content:space-between;
- padding:0 17px;position:sticky;top:0;z-index:10;
-}
-.logo{font-size:27px;font-weight:bold;color:#ff3155}
-.logo span{color:white}
-main{max-width:650px;margin:auto;padding:12px}
-.card{
- background:#191919;border:1px solid #333;
- border-radius:15px;padding:17px;margin-bottom:14px;
-}
-input,textarea{
- width:100%;padding:13px;margin:7px 0;
- background:#292929;border:1px solid #444;
- color:white;border-radius:10px;
-}
-button.primary{
- background:#ff3155;color:white;
- padding:13px;border-radius:10px;font-weight:bold;
-}
-button.secondary{
- background:#333;color:white;
- padding:12px;border-radius:10px;
-}
-.full{width:100%;margin:6px 0}
-.hidden{display:none!important}
-.small{color:#aaa;font-size:13px}
-#authStatus,#uploadStatus{color:#ff9bad;font-size:13px}
+  <!-- Fonts: Noto Sans Arabic / Vazirmatn for natural Kurdish Sorani + Inter for Latin/English -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-/* FOR YOU */
-#feedPage{margin:-12px}
-.feed-heading{
- display:flex;justify-content:center;gap:25px;
- padding:13px;background:#111;
- font-weight:bold;
-}
-.feed-heading span:last-child{color:#ff3155}
-.feed-scroll{
- height:calc(100dvh - 135px);
- overflow-y:auto;
- scroll-snap-type:y mandatory;
- scrollbar-width:none;
-}
-.feed-scroll::-webkit-scrollbar{display:none}
-.feed-item{
- height:100%;min-height:450px;
- position:relative;background:#000;
- scroll-snap-align:start;
- scroll-snap-stop:always;
- overflow:hidden;
-}
-.feed-video{
- width:100%;height:100%;
- object-fit:contain;background:#000;
-}
-.feed-info{
- position:absolute;bottom:22px;right:15px;
- left:80px;z-index:2;
- text-shadow:0 2px 5px black;
-}
-.feed-info h3{font-size:17px;margin:5px 0}
-.feed-info p{font-size:14px;line-height:1.5}
-.feed-actions{
- position:absolute;bottom:40px;left:12px;
- display:flex;flex-direction:column;
- gap:18px;align-items:center;z-index:3;
-}
-.action{
- display:flex;flex-direction:column;
- align-items:center;gap:4px;
-}
-.action button{
- width:45px;height:45px;border-radius:50%;
- background:#333b;color:white;font-size:20px;
-}
-.action span{font-size:12px;color:white}
-.bottom{
- position:fixed;bottom:0;left:0;right:0;
- height:65px;background:#151515;
- display:flex;justify-content:space-around;
- align-items:center;z-index:20;
-}
-.bottom button{
- background:transparent;color:white;
- font-size:13px;line-height:1.7;
-}
-.bottom button.active{color:#ff3155}
-#uploadPage,#profilePage{padding-bottom:75px}
-.avatar{
- width:75px;height:75px;border-radius:50%;
- background:#ff3155;margin:auto;
- display:grid;place-items:center;font-size:30px;
-}
-progress{width:100%;height:12px}
-</style>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            kurdish: ['"Noto Sans Arabic"', 'Inter', 'sans-serif'],
+            sans: ['Inter', '"Noto Sans Arabic"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              pink: '#fe2c55',
+              cyan: '#25f4ee',
+              dark: '#09090b',
+              card: '#141418',
+              elevated: '#1e1e24'
+            }
+          },
+          animation: {
+            'spin-slow': 'spin 5s linear infinite',
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float-up': 'floatUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+            'marquee': 'marquee 12s linear infinite'
+          },
+          keyframes: {
+            floatUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px) scale(0.6) rotate(-12deg)' },
+              '25%': { opacity: '1', transform: 'translateY(-10px) scale(1.15) rotate(6deg)' },
+              '100%': { opacity: '0', transform: 'translateY(-65px) scale(1.35) rotate(12deg)' }
+            },
+            marquee: {
+              '0%': { transform: 'translateX(0%)' },
+              '100%': { transform: 'translateX(50%)' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #09090b;
+      color: #f4f4f5;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* Hide scrollbars cleanly where needed */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Vertical snap scroll container */
+    .feed-snap-container {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      overflow-y: scroll;
+      height: 100%;
+      width: 100%;
+    }
+
+    .feed-snap-item {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* TikTok dual-tone glow accents */
+    .tiktok-btn-glow {
+      box-shadow: -2px 0 0 #25f4ee, 2px 0 0 #fe2c55;
+    }
+
+    .vinyl-grooves {
+      background: radial-gradient(circle at center, #18181b 18%, #09090b 19%, #27272a 21%, #09090b 23%, #18181b 38%, #09090b 40%, #27272a 42%, #09090b 44%, #18181b 100%);
+    }
+
+    @keyframes heartBurstAnim {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.35) rotate(-18deg);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.22) rotate(8deg);
+      }
+      45% {
+        transform: translate(-50%, -50%) scale(0.96) rotate(-4deg);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -55%) scale(1.08) rotate(2deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -85%) scale(1.35) rotate(10deg);
+      }
+    }
+
+    .heart-burst {
+      animation: heartBurstAnim 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes slideUpSheet {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0%);
+      }
+    }
+
+    .sheet-enter {
+      animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes marqueeLTR {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0%); }
+    }
+
+    .animate-marquee-rtl {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marqueeLTR 11s linear infinite;
+    }
+  </style>
 </head>
+<body class="font-kurdish bg-zinc-950 text-zinc-100 select-none">
 
-<body>
+  <!-- Main App Shell -->
+  <div id="app" class="relative w-full h-dvh max-w-md mx-auto bg-zinc-950 flex flex-col overflow-hidden shadow-2xl sm:border-x sm:border-zinc-800/80">
 
-<header>
- <div class="logo">Kurd<span>Tok</span></div>
- <button id="logout" class="secondary hidden">دەرچوون</button>
-</header>
+    <!-- Top Floating Header (Visible on Home Feed) -->
+    <header id="topHeader" class="absolute top-0 inset-x-0 z-30 pt-3 pb-4 px-3 bg-gradient-to-b from-black/75 via-black/35 to-transparent flex items-center justify-between pointer-events-none">
+      <!-- Left: Language Toggle & PWA Status -->
+      <div class="flex items-center gap-1.5 pointer-events-auto">
+        <button id="langToggleBtn" type="button" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-[11px] font-semibold tracking-wide transition flex items-center gap-1" title="گۆڕینی زمان / Switch Language">
+          <span id="langBadgeText">EN</span>
+        </button>
 
-<main>
+        <button id="pwaInstallHeaderBtn" type="button" class="px-2.5 py-1 rounded-full bg-gradient-to-r from-[#fe2c55]/90 to-[#ff5c7a]/90 hover:brightness-110 text-white text-[11px] font-bold shadow-lg shadow-[#fe2c55]/25 transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3" />
+          </svg>
+          <span id="installBtnLabel">دامەزراندن</span>
+        </button>
+      </div>
 
-<!-- LOGIN -->
-<section id="auth">
- <div class="card">
-  <div class="logo" style="text-align:center;font-size:55px">K</div>
-  <h2 style="text-align:center">بەخێربێیت بۆ KurdTok ❤️</h2>
-  <p class="small" style="text-align:center">
-   جیهانی ڤیدیۆی کوردی
-  </p>
+      <!-- Center: Feed Tabs (Following / For You / Explore) -->
+      <nav aria-label="Feed Tabs" class="flex items-center gap-4 pointer-events-auto">
+        <button data-feed-tab="following" class="feed-tab-btn relative py-1 text-sm font-bold text-white/65 hover:text-white transition">
+          <span class="tab-label-following">دواکەوتووەکان</span>
+          <span class="active-indicator hidden absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-white"></span>
+        </button>
 
-  <button class="primary full" id="signupTab">
-   دروستکردنی ئەکاونت
-  </button>
-  <button class="secondary full" id="loginTab">
-   چوونەژوورەوە
-  </button>
+        <button data-feed-tab="foryou" class="feed-tab-btn relative py-1 text-[15px] font-extrabold text-white transition">
+          <span class="tab-label-foryou">بۆ تۆ</span>
+          <span class="active-indicator absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#25f4ee] to-[#fe2c55]"></span>
+        </button>
 
-  <div id="signupForm">
-   <h3>ئەکاونتی نوێ</h3>
-   <input id="regName" placeholder="ناوی خۆت">
-   <input id="regEmail" type="email" placeholder="ئیمەیڵ">
-   <input id="regPass" type="password" placeholder="پاسۆرد - 6 پیت یان زیاتر">
-   <button class="primary full" id="signup">
-    دروستکردنی ئەکاونت
-   </button>
+        <button data-feed-tab="explore" class="feed-tab-btn relative py-1 text-sm font-bold text-white/65 hover:text-white transition">
+          <span class="tab-label-explore">گەڕان</span>
+          <span class="active-indicator hidden absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-white"></span>
+        </button>
+      </nav>
+
+      <!-- Right: Quick Search Icon -->
+      <button id="headerSearchBtn" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white pointer-events-auto transition" aria-label="Search">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- PWA Install Banner (Shown when installable or user opens PWA status) -->
+    <div id="pwaBanner" class="hidden absolute top-14 inset-x-3 z-30 rounded-2xl bg-zinc-900/95 backdrop-blur-xl border border-white/15 p-3 shadow-2xl flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#fe2c55] via-rose-500 to-[#25f4ee] p-[2px] shrink-0">
+          <div class="w-full h-full rounded-[10px] bg-zinc-950 flex items-center justify-center font-extrabold text-sm tracking-tight">
+            KT
+          </div>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <p id="pwaBannerTitle" class="text-xs font-bold text-white truncate">کوردتۆک وەک ئەپ دابمەزرێنە</p>
+            <span id="pwaOfflineBadge" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">PWA Ready</span>
+          </div>
+          <p id="pwaBannerDesc" class="text-[11px] text-zinc-400 truncate">خێراتر کاردەکات و پشتگیری ئۆفلاین دەکات</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="pwaConfirmInstallBtn" type="button" class="px-3 py-1.5 rounded-xl bg-[#fe2c55] hover:bg-[#ff3b62] text-white text-xs font-bold transition">
+          <span id="pwaInstallActionLabel">دامەزراندن</span>
+        </button>
+        <button id="pwaDismissBannerBtn" type="button" class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition" aria-label="Close banner">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 1: HOME VERTICAL SNAP VIDEO FEED -->
+    <main id="view-home" class="relative flex-1 w-full h-full overflow-hidden">
+      <div id="videoFeedContainer" class="feed-snap-container no-scrollbar">
+        <!-- Video cards injected dynamically by JS -->
+      </div>
+
+      <!-- Subtle Keyboard/Swipe Hint Toast (auto hides) -->
+      <div id="navHintPill" class="hidden pointer-events-none absolute bottom-20 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/10 text-[11px] text-zinc-200">
+        <span id="navHintText">بۆ ڤیدیۆی دواتر ڕابکێشە یان ↑ / ↓ بەکاربێنە</span>
+      </div>
+    </main>
+
+    <!-- VIEW 2: DISCOVER / SEARCH -->
+    <section id="view-discover" class="hidden flex-1 w-full h-full overflow-y-auto no-scrollbar pb-24 bg-zinc-950">
+      <div class="sticky top-0 z-20 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 pt-4 pb-3 space-y-3">
+        <div class="flex items-center justify-between">
+          <h1 id="discoverTitle" class="text-lg font-extrabold tracking-tight">گەڕان و دۆزینەوە</h1>
+          <span class="text-[11px] px-2 py-0.5 rounded-full bg-[#25f4ee]/15 text-[#25f4ee] font-semibold">#کوردتۆک</span>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative">
+          <input id="discoverSearchInput" type="text" placeholder="گەڕان بەدوای ڤیدیۆ، هەشتاگ، یان @ناو..." class="w-full rounded-2xl bg-zinc-900 border border-zinc-800 focus:border-[#25f4ee] focus:outline-none py-2.5 pr-10 pl-9 text-sm text-white placeholder:text-zinc-500 transition" />
+          <svg class="w-4 h-4 text-zinc-400 absolute top-1/2 -translate-y-1/2 right-3.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+          </svg>
+          <button id="clearSearchBtn" type="button" class="hidden absolute top-1/2 -translate-y-1/2 left-3 text-zinc-400 hover:text-white text-xs font-bold">✕</button>
+        </div>
+
+        <!-- Trending Hashtag Chips -->
+        <div id="trendingHashtagsRow" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Featured Banner Card -->
+      <div class="px-4 pt-4">
+        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-[#fe2c55]/25 via-purple-600/25 to-[#25f4ee]/25 border border-white/10 p-4">
+          <div class="relative z-10 flex items-center justify-between gap-3">
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-bold text-white mb-1.5">ترێندی کوردستان 🔥</span>
+              <h2 id="discoverBannerTitle" class="text-base font-extrabold text-white">چیرۆک و دیمەنە جوانەکانی کوردستان</h2>
+              <p id="discoverBannerSub" class="text-xs text-zinc-300 mt-0.5">تازەترین ڤیدیۆی هونەری، سروشت، مۆسیقا و کۆمیدی</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#fe2c55] to-[#25f4ee] flex items-center justify-center text-2xl shrink-0 shadow-lg">
+              🏔️
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Creators Strip -->
+      <div class="px-4 pt-5">
+        <h3 id="popularCreatorsTitle" class="text-sm font-bold text-zinc-200 mb-3">دروستکەرە دیارەکان</h3>
+        <div id="creatorsListContainer" class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Search / Filtered Video Grid -->
+      <div class="px-4 pt-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 id="discoverGridTitle" class="text-sm font-bold text-zinc-200">ڤیدیۆ هەڵبژێردراوەکان</h3>
+          <span id="discoverResultCount" class="text-xs text-zinc-400"></span>
+        </div>
+        <div id="discoverVideoGrid" class="grid grid-cols-2 gap-2.5">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: INBOX / ACTIVITY -->
+    <section id="view-inbox" class="hidden flex-1 w-full h-full overflow-y-auto no-scrollbar pb-24 bg-zinc-950">
+      <div class="sticky top-0 z-20 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3.5 flex items-center justify-between">
+        <h1 id="inboxTitle" class="text-lg font-extrabold">نامە و چالاکی</h1>
+        <button id="markAllReadBtn" type="button" class="text-xs font-bold text-[#25f4ee] hover:underline">
+          <span id="markAllReadLabel">خوێندنەوەی هەمووی</span>
+        </button>
+      </div>
+
+      <!-- Activity Filter Pills -->
+      <div class="px-4 pt-3 flex items-center gap-2">
+        <button data-inbox-filter="all" class="inbox-filter-btn px-3 py-1.5 rounded-full bg-white text-zinc-950 text-xs font-bold transition">
+          <span class="inbox-f-all">هەموو</span>
+        </button>
+        <button data-inbox-filter="likes" class="inbox-filter-btn px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-300 hover:bg-zinc-800 text-xs font-semibold transition">
+          <span class="inbox-f-likes">لایک</span>
+        </button>
+        <button data-inbox-filter="comments" class="inbox-filter-btn px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-300 hover:bg-zinc-800 text-xs font-semibold transition">
+          <span class="inbox-f-comments">کۆمێنت</span>
+        </button>
+        <button data-inbox-filter="follows" class="inbox-filter-btn px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-300 hover:bg-zinc-800 text-xs font-semibold transition">
+          <span class="inbox-f-follows">دواکەوتن</span>
+        </button>
+      </div>
+
+      <!-- Notifications Feed -->
+      <div id="inboxListContainer" class="px-4 pt-3 space-y-2.5">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 4: PROFILE -->
+    <section id="view-profile" class="hidden flex-1 w-full h-full overflow-y-auto no-scrollbar pb-24 bg-zinc-950">
+      <div class="sticky top-0 z-20 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h1 id="profileHandleHeader" class="text-base font-extrabold">@kurd_creator</h1>
+          <span class="px-2 py-0.5 rounded-full bg-[#fe2c55]/15 text-[#fe2c55] text-[10px] font-bold">PWA</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="profileEditBioBtn" type="button" class="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/70 text-xs font-semibold transition">
+            <span id="editProfileLabel">دەستکاری</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Hero Info -->
+      <div class="px-4 pt-5 pb-4 flex flex-col items-center text-center">
+        <div class="w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-[#fe2c55] via-amber-400 to-[#25f4ee] shadow-lg">
+          <div id="profileAvatarCircle" class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center text-2xl font-extrabold text-white">
+            ک
+          </div>
+        </div>
+
+        <h2 id="profileDisplayName" class="mt-3 text-base font-extrabold text-white">ئارام کوردستانی</h2>
+        <p id="profileBioText" class="mt-1 text-xs text-zinc-400 max-w-xs leading-relaxed">
+          دروستکەری ناوەڕۆکی کوردی 🏔️ | گەشت، مۆسیقا، و چیرۆکی ڕۆژانە لە کوردتۆک
+        </p>
+
+        <!-- Stats Row -->
+        <div class="mt-4 w-full max-w-xs grid grid-cols-3 gap-2 py-2.5 px-3 rounded-2xl bg-zinc-900/80 border border-zinc-800/80">
+          <div>
+            <div id="statFollowingCount" class="text-sm font-extrabold text-white">24</div>
+            <div id="statFollowingLabel" class="text-[11px] text-zinc-400">دواکەوتووەکان</div>
+          </div>
+          <div class="border-x border-zinc-800">
+            <div id="statFollowersCount" class="text-sm font-extrabold text-white">12.4K</div>
+            <div id="statFollowersLabel" class="text-[11px] text-zinc-400">شوێنکەوتوو</div>
+          </div>
+          <div>
+            <div id="statLikesCount" class="text-sm font-extrabold text-white">89.2K</div>
+            <div id="statLikesLabel" class="text-[11px] text-zinc-400">کۆی لایک</div>
+          </div>
+        </div>
+
+        <!-- Inline Bio Editor (hidden unless clicked) -->
+        <div id="bioEditorBox" class="hidden w-full mt-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-700 text-start space-y-2">
+          <label class="block text-xs font-bold text-zinc-300" id="bioInputLabel">ناو و باڕۆی پڕۆفایل</label>
+          <input id="editNameInput" type="text" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:border-[#25f4ee] focus:outline-none" />
+          <textarea id="editBioInput" rows="2" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-white focus:border-[#25f4ee] focus:outline-none"></textarea>
+          <div class="flex justify-end gap-2">
+            <button id="cancelBioBtn" type="button" class="px-3 py-1 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-300">پاشگەزبوونەوە</button>
+            <button id="saveBioBtn" type="button" class="px-3 py-1 rounded-lg bg-[#fe2c55] text-xs font-bold text-white">پاشەکەوتکردن</button>
+          </div>
+        </div>
+
+        <!-- PWA Capabilities Card inside Profile -->
+        <div class="w-full mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/60 border border-zinc-800 flex items-center justify-between gap-3 text-start">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="pwaCardTitle" class="text-xs font-bold text-white">دۆخی Progressive Web App (PWA)</span>
+            </div>
+            <p id="pwaCardStatusText" class="text-[11px] text-zinc-400 mt-0.5">Service Worker و Manifest چالاک کراون</p>
+          </div>
+          <button id="profileInstallPwaBtn" type="button" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-bold text-white shrink-0 transition">
+            <span id="profileInstallBtnText">دابەزاندنی ئەپ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Tabs: Uploaded / Liked / Saved -->
+      <div class="sticky top-[53px] z-10 bg-zinc-950/95 backdrop-blur border-y border-zinc-800/80 grid grid-cols-3">
+        <button data-profile-tab="uploaded" class="profile-tab-btn py-2.5 text-xs font-extrabold text-white border-b-2 border-[#fe2c55] flex items-center justify-center gap-1">
+          <span>🎬</span>
+          <span class="p-tab-uploaded">ڤیدیۆکانم</span>
+        </button>
+        <button data-profile-tab="liked" class="profile-tab-btn py-2.5 text-xs font-semibold text-zinc-400 hover:text-white border-b-2 border-transparent flex items-center justify-center gap-1">
+          <span>❤️</span>
+          <span class="p-tab-liked">لایککراو</span>
+        </button>
+        <button data-profile-tab="saved" class="profile-tab-btn py-2.5 text-xs font-semibold text-zinc-400 hover:text-white border-b-2 border-transparent flex items-center justify-center gap-1">
+          <span>🔖</span>
+          <span class="p-tab-saved">پاشەکەوت</span>
+        </button>
+      </div>
+
+      <!-- Profile Tab Grid -->
+      <div id="profileVideosGrid" class="p-3 grid grid-cols-3 gap-2">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <footer id="bottomNav" class="relative z-30 h-16 bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-800/80 px-2 flex items-center justify-around shrink-0">
+      <button data-nav="home" class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 py-1 px-2 text-white transition">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 3.172L3 10.672V20a1 1 0 001 1h6v-6h4v6h6a1 1 0 001-1v-9.328l-9-7.5z" />
+        </svg>
+        <span class="nav-label-home text-[10px] font-bold">سەرەکی</span>
+      </button>
+
+      <button data-nav="discover" class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 py-1 px-2 text-zinc-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+        </svg>
+        <span class="nav-label-discover text-[10px] font-semibold">گەڕان</span>
+      </button>
+
+      <!-- Center Upload "+" Button -->
+      <button id="openUploadModalBtn" type="button" class="group relative mx-1 flex items-center justify-center" aria-label="Upload Video">
+        <span class="w-11 h-7 rounded-xl bg-gradient-to-r from-[#25f4ee] via-white to-[#fe2c55] p-[2px] shadow-lg group-active:scale-95 transition">
+          <span class="w-full h-full rounded-[10px] bg-white text-zinc-950 flex items-center justify-center font-black text-lg leading-none">
+            +
+          </span>
+        </span>
+      </button>
+
+      <button data-nav="inbox" class="bottom-nav-btn relative flex flex-col items-center justify-center gap-0.5 py-1 px-2 text-zinc-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <span id="inboxUnreadDot" class="hidden absolute top-1 right-3 w-2 h-2 rounded-full bg-[#fe2c55]"></span>
+        <span class="nav-label-inbox text-[10px] font-semibold">نامەکان</span>
+      </button>
+
+      <button data-nav="profile" class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 py-1 px-2 text-zinc-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span class="nav-label-profile text-[10px] font-semibold">پڕۆفایل</span>
+      </button>
+    </footer>
+
+    <!-- SLIDE-UP COMMENTS DRAWER MODAL -->
+    <div id="commentsModal" class="hidden fixed inset-0 z-50 max-w-md mx-auto">
+      <div id="commentsBackdrop" class="absolute inset-0 bg-black/70 backdrop-blur-xs"></div>
+      <div class="sheet-enter absolute bottom-0 inset-x-0 h-[72dvh] rounded-t-3xl bg-zinc-900 border-t border-zinc-700/80 flex flex-col overflow-hidden">
+        <!-- Drawer Header -->
+        <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <span id="commentsCountTitle" class="text-sm font-extrabold text-white">0 کۆمێنت</span>
+          </div>
+          <button id="closeCommentsBtn" type="button" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition">
+            ✕
+          </button>
+        </div>
+
+        <!-- Comments Scroll List -->
+        <div id="commentsList" class="flex-1 overflow-y-auto px-4 py-3 space-y-3.5">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Quick Emoji Chips -->
+        <div class="px-4 py-1.5 bg-zinc-900/95 border-t border-zinc-800/70 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">🔥</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">❤️</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">👏</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">🏔️</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">😂 kurdish</button>
+          <button type="button" class="quick-emoji px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm transition">🎶</button>
+        </div>
+
+        <!-- Comment Input Bar -->
+        <form id="commentForm" class="p-3 bg-zinc-950 border-t border-zinc-800 flex items-center gap-2 shrink-0">
+          <input id="commentInput" type="text" required placeholder="کۆمێنتێکی جوان بنووسە..." class="flex-1 rounded-full bg-zinc-900 border border-zinc-700 focus:border-[#fe2c55] focus:outline-none px-4 py-2 text-xs text-white placeholder:text-zinc-500" />
+          <button type="submit" class="px-4 py-2 rounded-full bg-[#fe2c55] hover:bg-[#ff3b62] text-white text-xs font-bold transition shrink-0">
+            <span id="postCommentBtnText">ناردن</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- UPLOAD / CREATE VIDEO MODAL -->
+    <div id="uploadModal" class="hidden fixed inset-0 z-50 max-w-md mx-auto">
+      <div id="uploadBackdrop" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="sheet-enter absolute bottom-0 inset-x-0 max-h-[88dvh] rounded-t-3xl bg-zinc-900 border-t border-zinc-700/80 flex flex-col overflow-hidden">
+        <div class="px-4 py-3.5 border-b border-zinc-800 flex items-center justify-between shrink-0">
+          <h2 id="uploadModalTitle" class="text-base font-extrabold text-white">زیادکردنی ڤیدیۆی نوێ</h2>
+          <button id="closeUploadBtn" type="button" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300">
+            ✕
+          </button>
+        </div>
+
+        <form id="uploadVideoForm" class="p-4 space-y-4 overflow-y-auto no-scrollbar">
+          <!-- Local Media File Picker -->
+          <div>
+            <label id="uploadFileLabel" class="block text-xs font-bold text-zinc-300 mb-1.5">هەڵبژاردنی ڤیدیۆ یان وێنە لە ئامێرەکەت (ئارەزوومەندانە)</label>
+            <label class="flex flex-col items-center justify-center w-full h-24 rounded-2xl border-2 border-dashed border-zinc-700 hover:border-[#25f4ee] bg-zinc-950/70 cursor-pointer transition p-3 text-center">
+              <svg class="w-6 h-6 text-[#25f4ee] mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <span id="selectedFileNameText" class="text-xs text-zinc-300 font-medium truncate max-w-full">کرتە بکە بۆ هەڵبژاردنی فایل یان دیمەنی ئامادەکراو بەکاربێنە</span>
+              <input id="localMediaInput" type="file" accept="video/*,image/*" class="hidden" />
+            </label>
+          </div>
+
+          <!-- Preset Visual Scene Selector -->
+          <div>
+            <label id="presetSceneLabel" class="block text-xs font-bold text-zinc-300 mb-1.5">یان دیمەنێکی ئامادەکراوی کوردتۆک هەڵبژێرە</label>
+            <div id="presetSceneGrid" class="grid grid-cols-3 gap-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Caption -->
+          <div>
+            <label id="captionInputLabel" class="block text-xs font-bold text-zinc-300 mb-1.5">ناونیشان و هەشتاگ</label>
+            <textarea id="newVideoCaption" rows="2" required placeholder="بۆ نموونە: جوانی پاییز لە کوردستان 🍂 #کوردستان #پاییز #کوردتۆک" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#fe2c55] focus:outline-none p-3 text-xs text-white placeholder:text-zinc-500"></textarea>
+          </div>
+
+          <!-- Sound / Music -->
+          <div>
+            <label id="soundInputLabel" class="block text-xs font-bold text-zinc-300 mb-1.5">مۆسیقا / دەنگ</label>
+            <input id="newVideoSound" type="text" value="ئاوازی ڕەسەنی کوردی - Original Sound" class="w-full rounded-xl bg-zinc-950 border border-zinc-800 focus:border-[#25f4ee] focus:outline-none px-3.5 py-2 text-xs text-white" />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-[#fe2c55] to-[#ff4d6d] hover:brightness-110 text-white text-sm font-extrabold shadow-lg shadow-[#fe2c55]/30 transition">
+            <span id="publishVideoBtnText">بڵاوکردنەوە لە کوردتۆک 🚀</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION BANNER -->
+    <div id="toastBox" class="hidden pointer-events-none fixed top-20 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-full bg-zinc-900/95 backdrop-blur-md border border-white/15 text-xs font-bold text-white shadow-2xl transition-all">
+      <span id="toastMessage"></span>
+    </div>
+
   </div>
 
-  <div id="loginForm" class="hidden">
-   <h3>چوونەژوورەوە</h3>
-   <input id="email" type="email" placeholder="ئیمەیڵ">
-   <input id="pass" type="password" placeholder="پاسۆرد">
-   <button class="primary full" id="login">
-    بچۆ ژوورەوە
-   </button>
-   <button class="secondary full" id="reset">
-    بیرخستنەوەی پاسۆرد
-   </button>
-  </div>
-
-  <hr style="border-color:#333">
-
-  <h3>چوونەژوورەوە وەک میوان</h3>
-  <input id="guestName" placeholder="ناوی خۆت بنووسە">
-  <button class="secondary full" id="guest">
-   چوونەژوورەوە وەک میوان
-  </button>
-
-  <p id="authStatus"></p>
- </div>
-</section>
-
-<!-- APP -->
-<section id="app" class="hidden">
-
- <!-- FOR YOU -->
- <section id="feedPage">
-  <div class="feed-heading">
-   <span>دواتر</span>
-   <span>بۆ تۆ</span>
-  </div>
-  <div id="posts" class="feed-scroll">
-   <p style="text-align:center;padding:30px">
-    بارکردنی ڤیدیۆکان...
-   </p>
-  </div>
- </section>
-
- <!-- UPLOAD -->
- <section id="uploadPage" class="hidden">
-  <div class="card">
-   <h2>➕ بڵاوکردنەوەی ڤیدیۆ</h2>
-   <p class="small">ڤیدیۆی خۆت لە KurdTok بڵاو بکەرەوە</p>
-
-   <input id="file" type="file" accept="video/*">
-   <textarea id="caption" placeholder="دەربارەی ڤیدیۆکەت بنووسە..."></textarea>
-
-   <button id="upload" class="primary full">
-    بڵاوکردنەوە
-   </button>
-
-   <progress id="progress" max="100" value="0"></progress>
-   <p id="uploadStatus"></p>
-  </div>
- </section>
-
- <!-- PROFILE -->
- <section id="profilePage" class="hidden">
-  <div class="card" style="text-align:center">
-   <div class="avatar">K</div>
-   <h2 id="userName"></h2>
-   <p id="userEmail" class="small"></p>
-   <p id="userType" class="small"></p>
-   <button class="secondary full" id="profileLogout">
-    چوونەدەرەوە
-   </button>
-  </div>
- </section>
-
-</section>
-</main>
-
-<!-- NAVIGATION -->
-<nav class="bottom hidden" id="bottom">
- <button class="active" data-page="feed">🏠<br>بۆ تۆ</button>
- <button data-page="upload">➕<br>بڵاوکردنەوە</button>
- <button data-page="profile">👤<br>پڕۆفایل</button>
-</nav>
-
-<script type="module">
-
-// FIREBASE IMPORTS
-import {initializeApp}
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-
-import {
- getAuth,
- createUserWithEmailAndPassword,
- signInWithEmailAndPassword,
- signInAnonymously,
- onAuthStateChanged,
- signOut,
- sendPasswordResetEmail,
- updateProfile
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
-import {
- getFirestore,
- doc,setDoc,getDoc,
- collection,addDoc,getDocs,
- query,orderBy,limit,
- serverTimestamp,deleteDoc
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-import {
- getStorage,ref,
- uploadBytesResumable,getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
-
-// YOUR FIREBASE CONFIG
-const firebaseConfig={
- apiKey:"AIzaSyCq9l5BbPhyXDv4AWITe-R_Mg6jLoQf0C4",
- authDomain:"aizasy-2e889.firebaseapp.com",
- projectId:"aizasy-2e889",
- storageBucket:"aizasy-2e889.firebasestorage.app",
- messagingSenderId:"503323472309",
- appId:"1:503323472309:web:4ce8fd5b24585899dd29fc",
- measurementId:"G-E64YRW9ENL"
-};
-
-// INITIALIZE
-const firebaseApp=initializeApp(firebaseConfig);
-const auth=getAuth(firebaseApp);
-const db=getFirestore(firebaseApp);
-const storage=getStorage(firebaseApp);
-
-const $=id=>document.getElementById(id);
-let user=null;
-let videoObserver=null;
-
-function message(id,text){
- $(id).textContent=text;
-}
-
-// AUTH FORMS
-$("signupTab").onclick=()=>{
- $("signupForm").classList.remove("hidden");
- $("loginForm").classList.add("hidden");
-};
-
-$("loginTab").onclick=()=>{
- $("loginForm").classList.remove("hidden");
- $("signupForm").classList.add("hidden");
-};
-
-// CREATE ACCOUNT
-$("signup").onclick=async()=>{
- const name=$("regName").value.trim();
- const email=$("regEmail").value.trim();
- const password=$("regPass").value;
-
- if(!name||!email||password.length<6){
-  message("authStatus","تکایە زانیارییەکان بە دروستی بنووسە.");
-  return;
- }
-
- $("signup").disabled=true;
-
- try{
-  const result=await createUserWithEmailAndPassword(
-   auth,email,password
-  );
-
-  await updateProfile(result.user,{displayName:name});
-
-  await setDoc(doc(db,"users",result.user.uid),{
-   name:name,
-   email:email,
-   guest:false,
-   createdAt:serverTimestamp()
-  });
-
-  message("authStatus","ئەکاونتەکەت دروست کرا ❤️");
-
- }catch(e){
-  message("authStatus",e.message);
- }finally{
-  $("signup").disabled=false;
- }
-};
-
-// LOGIN
-$("login").onclick=async()=>{
- try{
-  await signInWithEmailAndPassword(
-   auth,
-   $("email").value.trim(),
-   $("pass").value
-  );
- }catch(e){
-  message("authStatus","ئیمەیڵ یان پاسۆرد هەڵەیە.");
- }
-};
-
-// GUEST LOGIN
-$("guest").onclick=async()=>{
- const name=$("guestName").value.trim();
-
- if(!name){
-  message("authStatus","ناوت بنووسە.");
-  return;
- }
-
- try{
-  const result=await signInAnonymously(auth);
-
-  await updateProfile(result.user,{displayName:name});
-
-  await setDoc(doc(db,"users",result.user.uid),{
-   name:name,
-   guest:true,
-   createdAt:serverTimestamp()
-  });
-
- }catch(e){
-  message("authStatus",e.message);
- }
-};
-
-// PASSWORD RESET
-$("reset").onclick=async()=>{
- const email=$("email").value.trim();
-
- if(!email){
-  message("authStatus","ئیمەیڵ بنووسە.");
-  return;
- }
-
- try{
-  await sendPasswordResetEmail(auth,email);
-  message("authStatus","لینکی گۆڕینی پاسۆرد نێردرا.");
- }catch(e){
-  message("authStatus",e.message);
- }
-};
-
-// USER SESSION
-onAuthStateChanged(auth,async u=>{
- user=u;
-
- if(!u){
-  $("auth").classList.remove("hidden");
-  $("app").classList.add("hidden");
-  $("bottom").classList.add("hidden");
-  $("logout").classList.add("hidden");
-  return;
- }
-
- $("auth").classList.add("hidden");
- $("app").classList.remove("hidden");
- $("bottom").classList.remove("hidden");
- $("logout").classList.remove("hidden");
-
- let name=u.displayName||"Guest";
- let guest=u.isAnonymous;
-
- try{
-  const profile=await getDoc(doc(db,"users",u.uid));
-
-  if(profile.exists()){
-   name=profile.data().name||name;
-   guest=profile.data().guest===true;
-  }
- }catch(e){
-  console.error(e);
- }
-
- $("userName").textContent=name;
- $("userEmail").textContent=u.email||"";
- $("userType").textContent=guest?"میوان":"ئەکاونتی بەکارهێنەر";
-
- page("feed");
- loadPosts();
-});
-
-// LOGOUT
-async function logout(){
- try{
-  await signOut(auth);
- }catch(e){
-  alert(e.message);
- }
-}
-$("logout").onclick=logout;
-$("profileLogout").onclick=logout;
-
-// PAGE NAVIGATION
-function page(name){
- ["feed","upload","profile"].forEach(p=>{
-  $(p+"Page").classList.toggle("hidden",p!==name);
- });
-
- document.querySelectorAll("[data-page]").forEach(b=>{
-  b.classList.toggle("active",b.dataset.page===name);
- });
-
- if(name==="feed"){
-  setTimeout(()=>playVisibleVideo(),100);
- }
-}
-
-document.querySelectorAll("[data-page]").forEach(b=>{
- b.onclick=()=>page(b.dataset.page);
-});
-
-// UPLOAD VIDEO
-$("upload").onclick=async()=>{
- if(!user){
-  message("uploadStatus","سەرەتا بچۆ ژوورەوە.");
-  return;
- }
-
- const file=$("file").files[0];
- const caption=$("caption").value.trim();
-
- if(!file){
-  message("uploadStatus","تکایە ڤیدیۆیەک هەڵبژێرە.");
-  return;
- }
-
- if(!file.type.startsWith("video/")){
-  message("uploadStatus","تەنها فایلی ڤیدیۆ ڕێگەپێدراوە.");
-  return;
- }
-
- if(file.size>100*1024*1024){
-  message("uploadStatus","قەبارەی ڤیدیۆ نابێت لە 100MB زیاتر بێت.");
-  return;
- }
-
- $("upload").disabled=true;
- message("uploadStatus","ئامادەکردنی بارکردن...");
- $("progress").value=0;
-
- try{
-  const path="videos/"+user.uid+"/"+Date.now();
-  const storageRef=ref(storage,path);
-
-  const task=uploadBytesResumable(storageRef,file);
-
-  task.on("state_changed",snapshot=>{
-   const percent=
-    snapshot.bytesTransferred/snapshot.totalBytes*100;
-
-   $("progress").value=percent;
-   message("uploadStatus","بارکردن: "+Math.round(percent)+"%");
-  },error=>{
-   message("uploadStatus",error.message);
-   $("upload").disabled=false;
-  },async()=>{
-   try{
-    const url=await getDownloadURL(task.snapshot.ref);
-
-    await addDoc(collection(db,"posts"),{
-     uid:user.uid,
-     name:user.displayName||"KurdTok User",
-     caption:caption,
-     videoUrl:url,
-     storagePath:path,
-     createdAt:serverTimestamp()
-    });
-
-    message("uploadStatus","ڤیدیۆکەت بڵاوکرایەوە ❤️");
-
-    $("file").value="";
-    $("caption").value="";
-    $("progress").value=0;
-
-    await loadPosts();
-    page("feed");
-
-   }catch(e){
-    message("uploadStatus",e.message);
-   }finally{
-    $("upload").disabled=false;
-   }
-  });
-
- }catch(e){
-  message("uploadStatus",e.message);
-  $("upload").disabled=false;
- }
-};
-
-// LOAD FOR YOU FEED
-async function loadPosts(){
- const container=$("posts");
-
- if(videoObserver){
-  videoObserver.disconnect();
-  videoObserver=null;
- }
-
- container.replaceChildren();
-
- const loading=document.createElement("p");
- loading.textContent="بارکردنی ڤیدیۆکان...";
- loading.style.textAlign="center";
- container.append(loading);
-
- try{
-  const postsQuery=query(
-   collection(db,"posts"),
-   orderBy("createdAt","desc"),
-   limit(50)
-  );
-
-  const snapshot=await getDocs(postsQuery);
-  container.replaceChildren();
-
-  if(snapshot.empty){
-   const empty=document.createElement("p");
-   empty.textContent="هێشتا ڤیدیۆ نییە. یەکەم ڤیدیۆ بڵاو بکەرەوە ❤️";
-   empty.style.textAlign="center";
-   empty.style.padding="30px";
-   container.append(empty);
-   return;
-  }
-
-  snapshot.docs.forEach(item=>{
-   const d=item.data();
-
-   const card=document.createElement("article");
-   card.className="feed-item";
-
-   const video=document.createElement("video");
-   video.className="feed-video";
-   video.src=d.videoUrl;
-   video.playsInline=true;
-   video.muted=true;
-   video.loop=true;
-   video.preload="metadata";
-
-   const info=document.createElement("div");
-   info.className="feed-info";
-
-   const name=document.createElement("h3");
-   name.textContent="@"+(d.name||"KurdTok");
-
-   const caption=document.createElement("p");
-   caption.textContent=d.caption||"";
-
-   info.append(name,caption);
-
-   const actions=document.createElement("div");
-   actions.className="feed-actions";
-
-   // LIKE
-   const likeWrap=document.createElement("div");
-   likeWrap.className="action";
-
-   const like=document.createElement("button");
-   like.textContent="❤️";
-
-   const likeText=document.createElement("span");
-   likeText.textContent="لایک";
-
-   like.onclick=async()=>{
-    await toggleLike(item.id,like,likeText);
-   };
-
-   likeWrap.append(like,likeText);
-
-   // COMMENTS
-   const commentWrap=document.createElement("div");
-   commentWrap.className="action";
-
-   const comment=document.createElement("button");
-   comment.textContent="💬";
-
-   const commentText=document.createElement("span");
-   commentText.textContent="کۆمێنت";
-
-   comment.onclick=()=>commentPost(item.id);
-
-   commentWrap.append(comment,commentText);
-
-   // SHARE
-   const shareWrap=document.createElement("div");
-   shareWrap.className="action";
-
-   const share=document.createElement("button");
-   share.textContent="↗";
-
-   const shareText=document.createElement("span");
-   shareText.textContent="هاوبەش";
-
-   share.onclick=async()=>{
-    try{
-     await navigator.clipboard.writeText(
-      location.href.split("#")[0]+"#"+item.id
-     );
-     shareText.textContent="کۆپی کرا";
-    }catch(e){
-     alert("نەتوانرا لینک کۆپی بکرێت.");
-    }
-   };
-
-   shareWrap.append(share,shareText);
-
-   actions.append(likeWrap,commentWrap,shareWrap);
-
-   video.onclick=()=>{
-    if(video.paused){
-     video.play().catch(()=>{});
-    }else{
-     video.pause();
-    }
-   };
-
-   card.append(video,info,actions);
-   container.append(card);
-  });
-
-  setupVideoObserver();
-
- }catch(e){
-  container.textContent="هەڵە لە بارکردنی ڤیدیۆکان: "+e.message;
- }
-}
-
-// AUTO PLAY VISIBLE VIDEO
-function setupVideoObserver(){
- if(videoObserver)videoObserver.disconnect();
-
- videoObserver=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-   const video=entry.target;
-
-   if(entry.isIntersecting){
-    video.play().catch(()=>{});
-   }else{
-    video.pause();
-   }
-  });
- },{
-  root:$("posts"),
-  threshold:0.7
- });
-
- document.querySelectorAll(".feed-video").forEach(video=>{
-  videoObserver.observe(video);
- });
-}
-
-function playVisibleVideo(){
- const container=$("posts");
- const videos=container.querySelectorAll("video");
-
- videos.forEach(video=>{
-  const rect=video.getBoundingClientRect();
-  const visible=rect.top>=0&&rect.bottom<=window.innerHeight;
-
-  if(visible&& !container.closest(".hidden")){
-   video.play().catch(()=>{});
-  }else{
-   video.pause();
-  }
- });
-}
-
-// LIKE SYSTEM
-async function toggleLike(postId,button,label){
- if(!user)return;
-
- try{
-  const likeRef=doc(db,"posts",postId,"likes",user.uid);
-  const existing=await getDoc(likeRef);
-
-  if(existing.exists()){
-   await deleteDoc(likeRef);
-   button.textContent="❤️";
-   label.textContent="لایک";
-  }else{
-   await setDoc(likeRef,{
-    uid:user.uid,
-    createdAt:serverTimestamp()
-   });
-
-   button.textContent="❤️";
-   label.textContent="لایک کرا";
-  }
- }catch(e){
-  alert("هەڵە لە لایک: "+e.message);
- }
-}
-
-// COMMENTS SYSTEM
-async function commentPost(postId){
- if(!user)return;
-
- const text=prompt("کۆمێنتەکەت بنووسە:");
-
- if(!text||!text.trim())return;
-
- try{
-  await addDoc(
-   collection(db,"posts",postId,"comments"),
-   {
-    uid:user.uid,
-    name:user.displayName||"Guest",
-    text:text.trim(),
-    createdAt:serverTimestamp()
-   }
-  );
-
-  alert("کۆمێنتەکەت نێردرا ❤️");
-
- }catch(e){
-  alert("هەڵە لە کۆمێنت: "+e.message);
- }
-}
-
-</script>
+  <!-- Complete KurdTok Application Logic + Dynamic PWA Manifest & Service Worker -->
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. DYNAMIC PWA MANIFEST & SERVICE WORKER REGISTRATION
+      // =========================================================================
+      function setupPWA() {
+        try {
+          // Create a dynamic SVG icon data URL for the PWA manifest
+          const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <rect width="512" height="512" rx="112" fill="#09090b"/>
+            <circle cx="256" cy="256" r="165" fill="none" stroke="#25f4ee" stroke-width="14" transform="translate(-8,-6)"/>
+            <circle cx="256" cy="256" r="165" fill="none" stroke="#fe2c55" stroke-width="14" transform="translate(8,6)"/>
+            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="136">KT</text>
+          </svg>`;
+          const iconDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcon)));
+
+          const manifestObj = {
+            name: 'KurdTok - کوردتۆک',
+            short_name: 'کوردتۆک',
+            description: 'پلاتفۆرمی ڤیدیۆی کورتی کوردی - KurdTok Short Video PWA',
+            start_url: './',
+            display: 'standalone',
+            orientation: 'portrait',
+            background_color: '#09090b',
+            theme_color: '#09090b',
+            dir: 'rtl',
+            lang: 'ckb',
+            icons: [
+              {
+                src: iconDataUrl,
+                sizes: '192x192',
+                type: 'image/svg+xml',
+                purpose: 'any maskable'
+              },
+              {
+                src: iconDataUrl,
+                sizes: '512x512',
+                type: 'image/svg+xml',
+                purpose: 'any maskable'
+              }
+            ]
+          };
+
+          const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const manifestUrl = URL.createObjectURL(manifestBlob);
+          const linkEl = document.createElement('link');
+          linkEl.rel = 'manifest';
+          linkEl.href = manifestUrl;
+          document.head.appendChild(linkEl);
+        } catch (err) {
+          console.warn('Manifest injection skipped:', err);
+        }
+
+        // Register Service Worker via Blob if supported on HTTP/HTTPS/localhost
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+          const swCode = `
+            const CACHE_NAME = 'kurdtok-shell-v1';
+            self.addEventListener('install', (event) => {
+              self.skipWaiting();
+              event.waitUntil(
+                caches.open(CACHE_NAME).then((cache) => {
+                  return cache.addAll(['./']).catch(() => {});
+                })
+              );
+            });
+            self.addEventListener('activate', (event) => {
+              event.waitUntil(
+                caches.keys().then((keys) => Promise.all(
+                  keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+                ))
+              );
+              self.clients.claim();
+            });
+            self.addEventListener('fetch', (event) => {
+              if (event.request.method !== 'GET') return;
+              event.respondWith(
+                fetch(event.request).then((response) => {
+                  const clone = response.clone();
+                  caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => {});
+                  return response;
+                }).catch(() => caches.match(event.request))
+              );
+            });
+          `;
+          try {
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl)
+              .then(() => {
+                const statusEl = document.getElementById('pwaCardStatusText');
+                if (statusEl) {
+                  statusEl.textContent = state.lang === 'ckb'
+                    ? 'Service Worker چالاکە • ئامادەی کارکردنی ئۆفلاین'
+                    : 'Service Worker Active • Offline Shell Ready';
+                }
+              })
+              .catch(() => {});
+          } catch (e) {
+            console.warn('SW registration skipped:', e);
+          }
+        }
+      }
+
+      // =========================================================================
+      // 2. TRANSLATIONS & INITIAL DATA
+      // =========================================================================
+      const I18N = {
+        ckb: {
+          dir: 'rtl',
+          langBadge: 'EN',
+          installBtn: 'دامەزراندن',
+          following: 'دواکەوتووەکان',
+          forYou: 'بۆ تۆ',
+          explore: 'گەڕان',
+          pwaTitle: 'کوردتۆک وەک ئەپ دابمەزرێنە',
+          pwaDesc: 'خێراتر کاردەکات و پشتگیری ئۆفلاین دەکات',
+          pwaInstallAction: 'دامەزراندن',
+          navHome: 'سەرەکی',
+          navDiscover: 'گەڕان',
+          navInbox: 'نامەکان',
+          navProfile: 'پڕۆفایل',
+          navHint: 'بۆ ڤیدیۆی دواتر ڕابکێشە یان ↑ / ↓ بەکاربێنە',
+          discoverTitle: 'گەڕان و دۆزینەوە',
+          searchPlaceholder: 'گەڕان بەدوای ڤیدیۆ، هەشتاگ، یان @ناو...',
+          discoverBannerTitle: 'چیرۆک و دیمەنە جوانەکانی کوردستان',
+          discoverBannerSub: 'تازەترین ڤیدیۆی هونەری، سروشت، مۆسیقا و کۆمیدی',
+          popularCreators: 'دروستکەرە دیارەکان',
+          curatedVideos: 'ڤیدیۆ هەڵبژێردراوەکان',
+          inboxTitle: 'نامە و چالاکی',
+          markAllRead: 'خوێندنەوەی هەمووی',
+          filterAll: 'هەموو',
+          filterLikes: 'لایک',
+          filterComments: 'کۆمێنت',
+          filterFollows: 'دواکەوتن',
+          editProfile: 'دەستکاری',
+          statFollowing: 'دواکەوتووەکان',
+          statFollowers: 'شوێنکەوتوو',
+          statLikes: 'کۆی لایک',
+          bioInputLabel: 'ناو و باڕۆی پڕۆفایل',
+          cancel: 'پاشگەزبوونەوە',
+          save: 'پاشەکەوتکردن',
+          pwaCardTitle: 'دۆخی Progressive Web App (PWA)',
+          pwaCardStatus: 'Service Worker و Manifest چالاک کراون',
+          downloadApp: 'دابەزاندنی ئەپ',
+          tabUploaded: 'ڤیدیۆکانم',
+          tabLiked: 'لایککراو',
+          tabSaved: 'پاشەکەوت',
+          commentsWord: 'کۆمێنت',
+          commentPlaceholder: 'کۆمێنتێکی جوان بنووسە...',
+          postComment: 'ناردن',
+          uploadTitle: 'زیادکردنی ڤیدیۆی نوێ',
+          uploadFileLabel: 'هەڵبژاردنی ڤیدیۆ یان وێنە لە ئامێرەکەت (ئارەزوومەندانە)',
+          uploadFileHint: 'کرتە بکە بۆ هەڵبژاردنی فایل یان دیمەنی ئامادەکراو بەکاربێنە',
+          presetLabel: 'یان دیمەنێکی ئامادەکراوی کوردتۆک هەڵبژێرە',
+          captionLabel: 'ناونیشان و هەشتاگ',
+          soundLabel: 'مۆسیقا / دەنگ',
+          publishBtn: 'بڵاوکردنەوە لە کوردتۆک 🚀',
+          followedToast: 'دوای هەژمارەکە کەوتیت ✓',
+          unfollowedToast: 'دواکەوتن لابرا',
+          savedToast: 'پاشەکەوت کرا لە لیستی تایبەت 🔖',
+          unsavedToast: 'لە پاشەکەوت لابرا',
+          copiedToast: 'بەستەری ڤیدیۆ کۆپی کرا 📋',
+          publishedToast: 'ڤیدیۆکەت بە سەرکەوتوویی بڵاوکرایەوە! 🎉',
+          pwaInstalledToast: 'کوردتۆک بە سەرکەوتوویی دامەزرا! 🚀',
+          pwaManualHint: 'لە مێنۆی وێبگەڕ "Add to Home Screen / Install App" هەڵبژێرە',
+          followBtn: 'شوێنکەوتن',
+          followingBtn: 'شوێنکەوتوو',
+          mutedToast: 'دەنگ کوژایەوە 🔇',
+          unmutedToast: 'دەنگ کرایەوە 🔊',
+          noResults: 'هیچ ڤیدیۆیەک نەدۆزرایەوە بەم گەڕانە.'
+        },
+        en: {
+          dir: 'ltr',
+          langBadge: 'کوردی',
+          installBtn: 'Install',
+          following: 'Following',
+          forYou: 'For You',
+          explore: 'Explore',
+          pwaTitle: 'Install KurdTok App',
+          pwaDesc: 'Faster launch, full-screen mode & offline shell',
+          pwaInstallAction: 'Install',
+          navHome: 'Home',
+          navDiscover: 'Discover',
+          navInbox: 'Inbox',
+          navProfile: 'Profile',
+          navHint: 'Swipe up/down or press ↑ / ↓ for next video',
+          discoverTitle: 'Discover & Search',
+          searchPlaceholder: 'Search videos, #hashtags, or @creators...',
+          discoverBannerTitle: 'Stories & Views of Kurdistan',
+          discoverBannerSub: 'Trending art, nature, music & comedy clips',
+          popularCreators: 'Featured Creators',
+          curatedVideos: 'Curated Clips',
+          inboxTitle: 'Inbox & Activity',
+          markAllRead: 'Mark all read',
+          filterAll: 'All',
+          filterLikes: 'Likes',
+          filterComments: 'Comments',
+          filterFollows: 'Follows',
+          editProfile: 'Edit',
+          statFollowing: 'Following',
+          statFollowers: 'Followers',
+          statLikes: 'Likes',
+          bioInputLabel: 'Profile Name & Bio',
+          cancel: 'Cancel',
+          save: 'Save',
+          pwaCardTitle: 'Progressive Web App (PWA) Status',
+          pwaCardStatus: 'Service Worker & Web Manifest active',
+          downloadApp: 'Get App',
+          tabUploaded: 'Videos',
+          tabLiked: 'Liked',
+          tabSaved: 'Saved',
+          commentsWord: 'comments',
+          commentPlaceholder: 'Write a comment...',
+          postComment: 'Post',
+          uploadTitle: 'Create New Video',
+          uploadFileLabel: 'Pick a local video or image (optional)',
+          uploadFileHint: 'Tap to choose media or pick a built-in KurdTok scene',
+          presetLabel: 'Or select a built-in animated scene',
+          captionLabel: 'Caption & Hashtags',
+          soundLabel: 'Sound / Music',
+          publishBtn: 'Publish to KurdTok 🚀',
+          followedToast: 'Following creator ✓',
+          unfollowedToast: 'Unfollowed',
+          savedToast: 'Saved to collection 🔖',
+          unsavedToast: 'Removed from saved',
+          copiedToast: 'Video link copied 📋',
+          publishedToast: 'Your video is now live on KurdTok! 🎉',
+          pwaInstalledToast: 'KurdTok installed successfully! 🚀',
+          pwaManualHint: 'Use browser menu "Add to Home Screen / Install App"',
+          followBtn: 'Follow',
+          followingBtn: 'Following',
+          mutedToast: 'Muted 🔇',
+          unmutedToast: 'Sound on 🔊',
+          noResults: 'No videos match your search.'
+        }
+      };
+
+      const PRESET_SCENES = [
+        {
+          id: 'hawraman',
+          labelCkb: 'هەورامان',
+          labelEn: 'Hawraman',
+          theme: 'mountain',
+          colors: ['#0f172a', '#1e3a5f', '#f97316', '#fde047'],
+          emoji: '🏔️'
+        },
+        {
+          id: 'neon_city',
+          labelCkb: 'شەوی هەولێر',
+          labelEn: 'Neon Night',
+          theme: 'neon',
+          colors: ['#09090b', '#3b0764', '#fe2c55', '#25f4ee'],
+          emoji: '🌃'
+        },
+        {
+          id: 'spring_meadow',
+          labelCkb: 'بەهار و گوڵ',
+          labelEn: 'Spring Meadow',
+          theme: 'waves',
+          colors: ['#064e3b', '#059669', '#34d399', '#a7f3d0'],
+          emoji: '🌿'
+        },
+        {
+          id: 'sunset_dunes',
+          labelCkb: 'خۆرئاوا',
+          labelEn: 'Sunset Glow',
+          theme: 'sunset',
+          colors: ['#1c1917', '#7c2d12', '#ea580c', '#fbbf24'],
+          emoji: '🌅'
+        },
+        {
+          id: 'music_pulse',
+          labelCkb: 'مۆسیقا و ڕیتم',
+          labelEn: 'Music Pulse',
+          theme: 'equalizer',
+          colors: ['#111827', '#831843', '#ec4899', '#22d3ee'],
+          emoji: '🎶'
+        },
+        {
+          id: 'starry_kurd',
+          labelCkb: 'ئاسمانی شەو',
+          labelEn: 'Starry Sky',
+          theme: 'stars',
+          colors: ['#030712', '#172554', '#6366f1', '#f472b6'],
+          emoji: '✨'
+        }
+      ];
+
+      const INITIAL_VIDEOS = [
+        {
+          id: 'vid_1',
+          creatorName: 'دانا ڕەسوڵ',
+          handle: '@dana_hawrami',
+          avatarLetter: 'د',
+          avatarGrad: 'from-amber-500 to-rose-600',
+          verified: true,
+          caption: 'دیمەنی چیاکانی هەورامان لە کاتی خۆرئاوادا، بەڕاستی بێوێنەیە ✨🏔️ #کوردستان #هەورامان #کوردتۆک',
+          sound: 'مۆسیقای فۆلکلۆری هەورامان - Original Audio',
+          likes: 14820,
+          comments: [
+            { id: 'c1', user: '@sara_kurd', text: 'ماشائەڵا چ دیمەنێکی سەرنجڕاکێشە 😍', time: '١٠ خولەک لەمەوپێش' },
+            { id: 'c2', user: '@karwan_art', text: 'زۆر جوان تۆمار کراوە، دەست خۆش!', time: '٥ خولەک لەمەوپێش' }
+          ],
+          shares: 412,
+          scene: PRESET_SCENES[0],
+          category: 'foryou',
+          isUserUpload: false
+        },
+        {
+          id: 'vid_2',
+          creatorName: 'لەنیا جاف',
+          handle: '@lanya_vibes',
+          avatarLetter: 'ل',
+          avatarGrad: 'from-[#fe2c55] to-purple-600',
+          verified: true,
+          caption: 'شەوانی پڕ لە ڕووناکی و ژیان، کاتێک ڕیتمی مۆسیقا لەگەڵ شەودا دەگونجێت 🌃🎶 #شەو #مۆسیقا #ترێند',
+          sound: 'Night Pulse Remix - DJ KurdBeats',
+          likes: 28940,
+          comments: [
+            { id: 'c3', user: '@zhyar_99', text: 'ئەم ڕیتمە زۆر خۆشە 🔥🔥', time: '٢٢ خولەک لەمەوپێش' }
+          ],
+          shares: 890,
+          scene: PRESET_SCENES[1],
+          category: 'foryou',
+          isUserUpload: false
+        },
+        {
+          id: 'vid_3',
+          creatorName: 'بڕوا محەمەد',
+          handle: '@brwa_nature',
+          avatarLetter: 'ب',
+          avatarGrad: 'from-emerald-500 to-teal-600',
+          verified: false,
+          caption: 'هەناسەیەکی قووڵ لە ناو سەوزایی و سروشتی کوردستاندا، ئارامی ڕۆح 🌿💚 #سروشت #کوردستان #ئارامی',
+          sound: 'دەنگی سروشت و شنەی با - Nature Sound',
+          likes: 9340,
+          comments: [
+            { id: 'c4', user: '@kajal_m', text: 'پێویستمان بەم جۆرە ڤیدیۆ ئارامانەیە 🌸', time: '١ کاتژمێر لەمەوپێش' }
+          ],
+          shares: 195,
+          scene: PRESET_SCENES[2],
+          category: 'following',
+          isUserUpload: false
+        },
+        {
+          id: 'vid_4',
+          creatorName: 'شەهێن کەریم',
+          handle: '@shahen_studio',
+          avatarLetter: 'ش',
+          avatarGrad: 'from-orange-500 to-pink-600',
+          verified: true,
+          caption: 'چرکەساتەکانی کۆتایی ڕۆژ و ڕەنگی زێڕینی ئاسمان، چیرۆکێکی بێکۆتایی 🌅✨ #خۆرئاوا #فۆتۆگرافی #کوردتۆک',
+          sound: 'Golden Hour Acoustic - KurdTok Mix',
+          likes: 19450,
+          comments: [
+            { id: 'c5', user: '@rezgar_d', text: 'ڕەنگەکان زۆر ناوازەن 👏', time: '٢ کاتژمێر لەمەوپێش' }
+          ],
+          shares: 530,
+          scene: PRESET_SCENES[3],
+          category: 'explore',
+          isUserUpload: false
+        },
+        {
+          id: 'vid_5',
+          creatorName: 'ڕێبوار سەڵاح',
+          handle: '@rebwar_beats',
+          avatarLetter: 'ڕ',
+          avatarGrad: 'from-indigo-500 to-cyan-500',
+          verified: true,
+          caption: 'تێکەڵکردنی مۆسیقای مۆدێرن لەگەڵ ڕۆحی کوردیدا، گوێ بگرە و هەست بە جیاوازی بکە 🎧🔥 #مۆسیقا #کوردتۆک #هونەر',
+          sound: 'KurdTok Bass Drop - Rebwar Beats',
+          likes: 34120,
+          comments: [
+            { id: 'c6', user: '@ava_music', text: 'بەڕاستی شازە، بەردەوام بە!', time: '٣ کاتژمێر لەمەوپێش' }
+          ],
+          shares: 1205,
+          scene: PRESET_SCENES[4],
+          category: 'foryou',
+          isUserUpload: false
+        }
+      ];
+
+      const INITIAL_NOTIFICATIONS = [
+        {
+          id: 'n1',
+          type: 'likes',
+          actor: '@dana_hawrami',
+          avatar: 'د',
+          grad: 'from-amber-500 to-rose-600',
+          textCkb: 'لایکی ڤیدیۆی "دیمەنی چیاکانی هەورامان"ی کرد',
+          textEn: 'liked "Hawraman Mountain Sunset"',
+          time: '٤ خولەک لەمەوپێش',
+          unread: true
+        },
+        {
+          id: 'n2',
+          type: 'comments',
+          actor: '@lanya_vibes',
+          avatar: 'ل',
+          grad: 'from-[#fe2c55] to-purple-600',
+          textCkb: 'کۆمێنتی نووسی: "زۆر ناوازەیە بەڕاستی 👏"',
+          textEn: 'commented: "So good, keep going 👏"',
+          time: '١٨ خولەک لەمەوپێش',
+          unread: true
+        },
+        {
+          id: 'n3',
+          type: 'follows',
+          actor: '@brwa_nature',
+          avatar: 'ب',
+          grad: 'from-emerald-500 to-teal-600',
+          textCkb: 'دوای هەژمارەکەت کەوت لە کوردتۆک',
+          textEn: 'started following you on KurdTok',
+          time: '٤٥ خولەک لەمەوپێش',
+          unread: true
+        },
+        {
+          id: 'n4',
+          type: 'likes',
+          actor: '@rebwar_beats',
+          avatar: 'ڕ',
+          grad: 'from-indigo-500 to-cyan-500',
+          textCkb: '١٢٠ کەسی تر لایکی ڤیدیۆکانیان کرد',
+          textEn: 'and 120 others liked your clips',
+          time: '٢ کاتژمێر لەمەوپێش',
+          unread: false
+        }
+      ];
+
+      // =========================================================================
+      // 3. APPLICATION STATE & PERSISTENCE
+      // =========================================================================
+      const state = {
+        lang: 'ckb',
+        activeNav: 'home',
+        feedTab: 'foryou',
+        profileTab: 'uploaded',
+        inboxFilter: 'all',
+        videos: JSON.parse(JSON.stringify(INITIAL_VIDEOS)),
+        likedIds: ['vid_1'],
+        savedIds: ['vid_2'],
+        followedHandles: ['@dana_hawrami', '@brwa_nature'],
+        notifications: JSON.parse(JSON.stringify(INITIAL_NOTIFICATIONS)),
+        profile: {
+          name: 'ئارام کوردستانی',
+          handle: '@kurd_creator',
+          bio: 'دروستکەری ناوەڕۆکی کوردی 🏔️ | گەشت، مۆسیقا، و چیرۆکی ڕۆژانە لە کوردتۆک',
+          followers: 12400,
+          likes: 89200
+        },
+        activeVideoId: 'vid_1',
+        commentModalVideoId: null,
+        selectedUploadScene: PRESET_SCENES[0],
+        uploadedMediaUrl: null,
+        uploadedMediaType: null,
+        isMuted: false,
+        searchQuery: '',
+        deferredInstallPrompt: null
+      };
+
+      // =========================================================================
+      // 4. HELPER UTILITIES
+      // =========================================================================
+      function formatCompactNumber(num) {
+        if (num >= 1000000) {
+          return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        }
+        if (num >= 1000) {
+          return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        }
+        return String(num);
+      }
+
+      function t(key) {
+        return (I18N[state.lang] && I18N[state.lang][key]) || I18N.ckb[key] || key;
+      }
+
+      let toastTimer = null;
+      function showToast(message) {
+        const box = document.getElementById('toastBox');
+        const msgEl = document.getElementById('toastMessage');
+        if (!box || !msgEl) return;
+        msgEl.textContent = message;
+        box.classList.remove('hidden');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          box.classList.add('hidden');
+        }, 2200);
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      function formatCaptionWithHashtags(caption) {
+        return escapeHtml(caption).replace(/(#[\w\u0600-\u06FF_]+)/g, (match) => {
+          return `<button type="button" data-hashtag="${match}" class="hashtag-chip inline font-bold text-[#25f4ee] hover:underline mx-0.5">${match}</button>`;
+        });
+      }
+
+      // =========================================================================
+      // 5. ANIMATED CANVAS VIDEO ENGINE (SELF-CONTAINED VISUAL PLAYBACK)
+      // =========================================================================
+      const canvasAnimations = new Map(); // videoId -> { stopFn }
+
+      function startCanvasAnimation(canvas, scene, videoId, isPlaying) {
+        stopCanvasAnimation(videoId);
+        if (!canvas || !scene) return;
+
+        const parent = canvas.parentElement;
+        const rect = parent ? parent.getBoundingClientRect() : { width: 390, height: 700 };
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = Math.max(240, Math.floor(rect.width));
+        const h = Math.max(400, Math.floor(rect.height));
+
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+
+        let phase = 0;
+        let rafId = null;
+        let running = Boolean(isPlaying);
+
+        // Pre-generate particles for dynamic visual motion
+        const particles = Array.from({ length: 28 }, (_, idx) => ({
+          x: ((idx * 73) % 100) / 100 * w,
+          y: ((idx * 137) % 100) / 100 * h,
+          r: 1.5 + (idx % 4) * 1.1,
+          speedY: 0.35 + (idx % 5) * 0.18,
+          drift: (idx % 2 === 0 ? 1 : -1) * (0.2 + (idx % 3) * 0.12),
+          alpha: 0.25 + (idx % 5) * 0.14
+        }));
+
+        function drawFrame() {
+          // 1. Rich multi-stop background gradient
+          const grad = ctx.createLinearGradient(0, 0, w * 0.85, h);
+          grad.addColorStop(0, scene.colors[0] || '#09090b');
+          grad.addColorStop(0.5, scene.colors[1] || '#18181b');
+          grad.addColorStop(1, scene.colors[2] || '#fe2c55');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, w, h);
+
+          // 2. Ambient glowing orbs
+          const orb1X = w * 0.5 + Math.cos(phase * 0.8) * (w * 0.26);
+          const orb1Y = h * 0.36 + Math.sin(phase * 0.65) * (h * 0.12);
+          const orb1 = ctx.createRadialGradient(orb1X, orb1Y, 10, orb1X, orb1Y, w * 0.55);
+          orb1.addColorStop(0, (scene.colors[3] || '#25f4ee') + '55');
+          orb1.addColorStop(1, 'transparent');
+          ctx.fillStyle = orb1;
+          ctx.fillRect(0, 0, w, h);
+
+          // 3. Theme-specific visual motion (mountains / equalizer / waves)
+          if (scene.theme === 'equalizer' || scene.theme === 'neon') {
+            const barCount = 16;
+            const totalBarW = w * 0.72;
+            const startX = (w - totalBarW) / 2;
+            const gap = totalBarW / barCount;
+            const baseY = h * 0.54;
+
+            for (let i = 0; i < barCount; i++) {
+              const amp = 24 + Math.abs(Math.sin(phase * 2.4 + i * 0.55)) * 78;
+              const barH = amp;
+              ctx.fillStyle = i % 2 === 0 ? 'rgba(37, 244, 238, 0.35)' : 'rgba(254, 44, 85, 0.38)';
+              const bx = startX + i * gap + gap * 0.18;
+              const bw = gap * 0.64;
+              ctx.beginPath();
+              ctx.roundRect(bx, baseY - barH / 2, bw, barH, 8);
+              ctx.fill();
+            }
+          }
+
+          // Layered stylized mountain ridges
+          const ridgeBase = h * 0.66;
+          ctx.fillStyle = 'rgba(9, 9, 11, 0.42)';
+          ctx.beginPath();
+          ctx.moveTo(0, h);
+          for (let x = 0; x <= w + 20; x += 20) {
+            const y = ridgeBase - Math.abs(Math.sin(x * 0.0085 + phase * 0.25)) * 85 - Math.cos(x * 0.004) * 35;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = 'rgba(9, 9, 11, 0.68)';
+          ctx.beginPath();
+          ctx.moveTo(0, h);
+          for (let x = 0; x <= w + 20; x += 20) {
+            const y = ridgeBase + 45 - Math.abs(Math.cos(x * 0.011 - phase * 0.18)) * 68;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fill();
+
+          // 4. Floating particles / stars / sparks
+          particles.forEach((p) => {
+            if (running) {
+              p.y -= p.speedY;
+              p.x += p.drift + Math.sin(phase + p.y * 0.01) * 0.25;
+              if (p.y < -10) {
+                p.y = h + 10;
+                p.x = Math.random() * w;
+              }
+              if (p.x < -10) p.x = w + 10;
+              if (p.x > w + 10) p.x = -10;
+            }
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+            ctx.fill();
+          });
+
+          // 5. Center artistic emblem & KurdTok watermark
+          const centerY = h * 0.42 + Math.sin(phase * 1.5) * 8;
+          ctx.save();
+          ctx.font = '64px "Noto Sans Arabic", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(scene.emoji || '🎬', w / 2, centerY);
+
+          ctx.font = '800 13px Inter, "Noto Sans Arabic", sans-serif';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.fillText('KURDTOK • کوردتۆک', w / 2, centerY + 54);
+          ctx.restore();
+
+          if (running) {
+            phase += 0.025;
+            rafId = requestAnimationFrame(drawFrame);
+          }
+        }
+
+        drawFrame();
+
+        canvasAnimations.set(videoId, {
+          setPlaying(playState) {
+            running = Boolean(playState);
+            if (running && !rafId) {
+              rafId = requestAnimationFrame(drawFrame);
+            } else if (!running && rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+            }
+          },
+          stop() {
+            running = false;
+            if (rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+            }
+          }
+        });
+      }
+
+      function stopCanvasAnimation(videoId) {
+        const entry = canvasAnimations.get(videoId);
+        if (entry) {
+          entry.stop();
+          canvasAnimations.delete(videoId);
+        }
+      }
+
+      // =========================================================================
+      // 6. FEED RENDERING & INTERACTIONS (LIKE, DOUBLE-TAP HEART, FOLLOW, SHARE)
+      // =========================================================================
+      function getFilteredFeedVideos() {
+        if (state.feedTab === 'following') {
+          const followedVids = state.videos.filter((v) => state.followedHandles.includes(v.handle));
+          return followedVids.length > 0 ? followedVids : state.videos.slice(0, 2);
+        }
+        if (state.feedTab === 'explore') {
+          return [...state.videos].sort((a, b) => b.likes - a.likes);
+        }
+        return state.videos;
+      }
+
+      function renderVideoFeed() {
+        const container = document.getElementById('videoFeedContainer');
+        if (!container) return;
+
+        // Clean up old canvas loops
+        canvasAnimations.forEach((_, key) => stopCanvasAnimation(key));
+
+        const list = getFilteredFeedVideos();
+        if (list.length === 0) {
+          container.innerHTML = `<div class="h-full flex items-center justify-center p-6 text-center text-sm text-zinc-400">${escapeHtml(t('noResults'))}</div>`;
+          return;
+        }
+
+        if (!list.some((v) => v.id === state.activeVideoId)) {
+          state.activeVideoId = list[0].id;
+        }
+
+        container.innerHTML = list.map((vid, index) => {
+          const isLiked = state.likedIds.includes(vid.id);
+          const isSaved = state.savedIds.includes(vid.id);
+          const isFollowing = state.followedHandles.includes(vid.handle);
+          const displayLikes = vid.likes + (isLiked ? 1 : 0);
+          const commentCount = vid.comments.length;
+          const isFirst = index === 0;
+
+          // Render either uploaded user media (<video>/<img>) or animated HTML5 canvas
+          let mediaHtml = '';
+          if (vid.mediaUrl && vid.mediaType && vid.mediaType.startsWith('video/')) {
+            mediaHtml = `
+              <video
+                src="${vid.mediaUrl}"
+                class="w-full h-full object-cover"
+                loop
+                playsinline
+                ${state.isMuted ? 'muted' : ''}
+                ${isFirst ? 'autoplay' : ''}
+              ></video>
+            `;
+          } else if (vid.mediaUrl && vid.mediaType && vid.mediaType.startsWith('image/')) {
+            mediaHtml = `
+              <img src="${vid.mediaUrl}" alt="Uploaded media" class="w-full h-full object-cover scale-105 animate-pulse-fast" />
+            `;
+          } else {
+            mediaHtml = `<canvas id="canvas-${vid.id}" class="w-full h-full block"></canvas>`;
+          }
+
+          return `
+            <article id="card-${vid.id}" data-video-id="${vid.id}" class="feed-snap-item bg-zinc-950 overflow-hidden">
+              <!-- Visual Media Layer -->
+              <div class="video-tap-surface relative w-full h-full cursor-pointer">
+                ${mediaHtml}
+
+                <!-- Top & Bottom Gradients for High Readability -->
+                <div class="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/65 to-transparent"></div>
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-black/85 via-black/40 to-transparent"></div>
+
+                <!-- Paused Overlay Indicator -->
+                <div class="pause-indicator hidden pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+                  <div class="w-16 h-16 rounded-full bg-black/55 backdrop-blur-md flex items-center justify-center text-white shadow-2xl">
+                    <svg class="w-8 h-8 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mute / Unmute Floating Pill (top-right under header) -->
+              <button type="button" data-action="mute" class="mute-toggle-btn absolute top-16 end-3 z-20 px-2.5 py-1 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-white flex items-center gap-1 transition">
+                <span>${state.isMuted ? '🔇' : '🔊'}</span>
+                <span>${state.isMuted ? (state.lang === 'ckb' ? 'بێدەنگ' : 'Muted') : (state.lang === 'ckb' ? 'دەنگ' : 'Sound')}</span>
+              </button>
+
+              <!-- Right-Side Floating Action Bar -->
+              <aside class="absolute bottom-24 end-2.5 z-20 flex flex-col items-center gap-4">
+                <!-- Creator Avatar + Follow Badge -->
+                <div class="relative mb-1">
+                  <button type="button" data-action="creator-profile" data-handle="${vid.handle}" class="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-[#fe2c55] to-[#25f4ee] shadow-lg block">
+                    <div class="w-full h-full rounded-full bg-gradient-to-br ${vid.avatarGrad} flex items-center justify-center text-base font-extrabold text-white">
+                      ${escapeHtml(vid.avatarLetter)}
+                    </div>
+                  </button>
+                  <button type="button" data-action="follow" data-handle="${vid.handle}" class="follow-badge-btn -bottom-2 left-1/2 -translate-x-1/2 absolute w-5 h-5 rounded-full ${isFollowing ? 'bg-emerald-500 text-white' : 'bg-[#fe2c55] text-white'} flex items-center justify-center text-xs font-black shadow-md transition active:scale-90" title="${isFollowing ? t('followingBtn') : t('followBtn')}">
+                    ${isFollowing ? '✓' : '+'}
+                  </button>
+                </div>
+
+                <!-- Like Button -->
+                <button type="button" data-action="like" data-video-id="${vid.id}" class="like-btn flex flex-col items-center gap-1 group active:scale-90 transition">
+                  <div class="w-11 h-11 rounded-full bg-black/35 backdrop-blur-xs flex items-center justify-center group-hover:bg-black/55 transition">
+                    <svg class="like-icon w-7 h-7 transition-transform duration-200 ${isLiked ? 'text-[#fe2c55] scale-110' : 'text-white'}" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                  <span class="like-count text-[11px] font-bold text-white drop-shadow">${formatCompactNumber(displayLikes)}</span>
+                </button>
+
+                <!-- Comment Button -->
+                <button type="button" data-action="comment" data-video-id="${vid.id}" class="flex flex-col items-center gap-1 group active:scale-90 transition">
+                  <div class="w-11 h-11 rounded-full bg-black/35 backdrop-blur-xs flex items-center justify-center group-hover:bg-black/55 transition">
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                    </svg>
+                  </div>
+                  <span class="comment-count text-[11px] font-bold text-white drop-shadow">${formatCompactNumber(commentCount)}</span>
+                </button>
+
+                <!-- Bookmark / Save Button -->
+                <button type="button" data-action="save" data-video-id="${vid.id}" class="save-btn flex flex-col items-center gap-1 group active:scale-90 transition">
+                  <div class="w-11 h-11 rounded-full bg-black/35 backdrop-blur-xs flex items-center justify-center group-hover:bg-black/55 transition">
+                    <svg class="save-icon w-6 h-6 transition ${isSaved ? 'text-amber-400 scale-110' : 'text-white'}" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </div>
+                  <span class="text-[11px] font-bold text-white drop-shadow">${state.lang === 'ckb' ? 'پاشەکەوت' : 'Save'}</span>
+                </button>
+
+                <!-- Share Button -->
+                <button type="button" data-action="share" data-video-id="${vid.id}" class="flex flex-col items-center gap-1 group active:scale-90 transition">
+                  <div class="w-11 h-11 rounded-full bg-black/35 backdrop-blur-xs flex items-center justify-center group-hover:bg-black/55 transition">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                  </div>
+                  <span class="share-count text-[11px] font-bold text-white drop-shadow">${formatCompactNumber(vid.shares)}</span>
+                </button>
+
+                <!-- Spinning Vinyl Sound Disc -->
+                <div class="mt-1 w-11 h-11 rounded-full vinyl-grooves p-2 border-2 border-zinc-700/80 animate-spin-slow flex items-center justify-center shadow-xl">
+                  <div class="w-4 h-4 rounded-full bg-gradient-to-tr ${vid.avatarGrad} flex items-center justify-center text-[9px] font-black text-white">
+                    ♪
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Bottom Overlay Info: Handle, Verified Badge, Caption, Music Marquee -->
+              <div class="pointer-events-none absolute bottom-4 inset-x-3 z-20 pe-14 space-y-2">
+                <div class="pointer-events-auto flex items-center gap-2">
+                  <span class="text-sm font-extrabold text-white drop-shadow">${escapeHtml(vid.handle)}</span>
+                  ${vid.verified ? `
+                    <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#25f4ee] text-zinc-950 text-[10px] font-black" title="Verified">✓</span>
+                  ` : ''}
+                  <button type="button" data-action="follow" data-handle="${vid.handle}" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition ${isFollowing ? 'bg-white/15 border-white/25 text-white' : 'bg-[#fe2c55] border-[#fe2c55] text-white'}">
+                    ${isFollowing ? t('followingBtn') : t('followBtn')}
+                  </button>
+                </div>
+
+                <!-- Caption with Clickable Hashtags -->
+                <p class="pointer-events-auto text-[13px] leading-relaxed text-zinc-100 drop-shadow line-clamp-3">
+                  ${formatCaptionWithHashtags(vid.caption)}
+                </p>
+
+                <!-- Scrolling Sound Marquee -->
+                <div class="flex items-center gap-2 max-w-[240px] overflow-hidden">
+                  <span class="text-xs shrink-0">🎵</span>
+                  <div class="overflow-hidden whitespace-nowrap flex-1">
+                    <div class="animate-marquee-rtl text-xs font-medium text-zinc-200">
+                      <span class="mx-3">${escapeHtml(vid.sound)}</span>
+                      <span class="mx-3">${escapeHtml(vid.sound)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Scrubbing Playback Progress Bar -->
+                <div class="pointer-events-auto pt-1">
+                  <input type="range" min="0" max="100" value="${isFirst ? 28 : 0}" aria-label="Video progress" class="scrub-bar w-full h-1 bg-white/25 rounded-lg appearance-none cursor-pointer accent-[#fe2c55]" />
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        // Initialize canvas visuals & attach per-card event listeners
+        list.forEach((vid, idx) => {
+          const cardEl = document.getElementById(`card-${vid.id}`);
+          const canvasEl = document.getElementById(`canvas-${vid.id}`);
+          if (canvasEl) {
+            startCanvasAnimation(canvasEl, vid.scene, vid.id, idx === 0);
+          }
+
+          if (!cardEl) return;
+
+          // Tap to play/pause & Double-Tap to burst heart
+          const tapSurface = cardEl.querySelector('.video-tap-surface');
+          const pauseIndicator = cardEl.querySelector('.pause-indicator');
+          const scrubBar = cardEl.querySelector('.scrub-bar');
+          let lastTapTime = 0;
+          let singleTapTimeout = null;
+          let isPaused = false;
+          let progressVal = idx === 0 ? 28 : 0;
+
+          // Simulated smooth progress advance when active & playing
+          const progressInterval = setInterval(() => {
+            if (!isPaused && state.activeVideoId === vid.id && state.activeNav === 'home') {
+              progressVal = progressVal >= 100 ? 0 : progressVal + 0.8;
+              if (scrubBar && document.activeElement !== scrubBar) {
+                scrubBar.value = progressVal;
+              }
+            }
+          }, 160);
+
+          // Store cleanup on card
+          cardEl._cleanup = () => clearInterval(progressInterval);
+
+          if (scrubBar) {
+            scrubBar.addEventListener('input', (e) => {
+              progressVal = Number(e.target.value);
+            });
+          }
+
+          if (tapSurface) {
+            tapSurface.addEventListener('click', (e) => {
+              const now = Date.now();
+              const rect = tapSurface.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+
+              if (now - lastTapTime < 280) {
+                // Double tap -> Like + Heart burst!
+                clearTimeout(singleTapTimeout);
+                spawnHeartBurst(cardEl, x, y);
+                if (!state.likedIds.includes(vid.id)) {
+                  toggleLike(vid.id, true);
+                }
+              } else {
+                // Single tap -> Toggle Play/Pause after brief window
+                singleTapTimeout = setTimeout(() => {
+                  isPaused = !isPaused;
+                  if (pauseIndicator) {
+                    pauseIndicator.classList.toggle('hidden', !isPaused);
+                  }
+                  const animCtrl = canvasAnimations.get(vid.id);
+                  if (animCtrl) animCtrl.setPlaying(!isPaused);
+
+                  const videoEl = tapSurface.querySelector('video');
+                  if (videoEl) {
+                    if (isPaused) videoEl.pause();
+                    else videoEl.play().catch(() => {});
+                  }
+                }, 220);
+              }
+              lastTapTime = now;
+            });
+          }
+
+          // Action buttons inside card
+          cardEl.querySelectorAll('[data-action]').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const action = btn.getAttribute('data-action');
+              const targetVidId = btn.getAttribute('data-video-id') || vid.id;
+              const targetHandle = btn.getAttribute('data-handle') || vid.handle;
+
+              if (action === 'like') {
+                toggleLike(targetVidId, false);
+              } else if (action === 'comment') {
+                openCommentsModal(targetVidId);
+              } else if (action === 'save') {
+                toggleSave(targetVidId);
+              } else if (action === 'share') {
+                shareVideo(targetVidId);
+              } else if (action === 'follow') {
+                toggleFollow(targetHandle);
+              } else if (action === 'mute') {
+                toggleMuteAll();
+              } else if (action === 'creator-profile') {
+                state.searchQuery = targetHandle;
+                const searchInput = document.getElementById('discoverSearchInput');
+                if (searchInput) searchInput.value = targetHandle;
+                switchNav('discover');
+              }
+            });
+          });
+
+          // Hashtag click inside caption -> jump to Discover filtered by hashtag
+          cardEl.querySelectorAll('.hashtag-chip').forEach((chip) => {
+            chip.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const tag = chip.getAttribute('data-hashtag') || '';
+              state.searchQuery = tag;
+              const searchInput = document.getElementById('discoverSearchInput');
+              if (searchInput) searchInput.value = tag;
+              switchNav('discover');
+            });
+          });
+        });
+
+        setupFeedScrollObserver(container);
+      }
+
+      function spawnHeartBurst(parentEl, x, y) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-burst pointer-events-none absolute z-30 text-6xl select-none';
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+        heart.innerHTML = `<span class="drop-shadow-[0_6px_20px_rgba(254,44,85,0.75)]">❤️</span>`;
+        parentEl.appendChild(heart);
+        setTimeout(() => heart.remove(), 900);
+      }
+
+      let feedObserver = null;
+      function setupFeedScrollObserver(container) {
+        if (feedObserver) feedObserver.disconnect();
+
+        feedObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const vidId = entry.target.getAttribute('data-video-id');
+              const animCtrl = canvasAnimations.get(vidId);
+              const videoEl = entry.target.querySelector('video');
+
+              if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+                state.activeVideoId = vidId;
+                if (animCtrl) animCtrl.setPlaying(true);
+                if (videoEl) {
+                  videoEl.muted = state.isMuted;
+                  videoEl.play().catch(() => {});
+                }
+              } else {
+                if (animCtrl) animCtrl.setPlaying(false);
+                if (videoEl) {
+                  videoEl.pause();
+                }
+              }
+            });
+          },
+          { root: container, threshold: [0.65] }
+        );
+
+        container.querySelectorAll('.feed-snap-item').forEach((item) => feedObserver.observe(item));
+      }
+
+      function toggleLike(videoId, fromDoubleTap) {
+        const vid = state.videos.find((v) => v.id === videoId);
+        if (!vid) return;
+
+        const idx = state.likedIds.indexOf(videoId);
+        let nowLiked = false;
+        if (idx === -1) {
+          state.likedIds.push(videoId);
+          state.profile.likes += 1;
+          nowLiked = true;
+        } else if (!fromDoubleTap) {
+          state.likedIds.splice(idx, 1);
+          state.profile.likes = Math.max(0, state.profile.likes - 1);
+          nowLiked = false;
+        } else {
+          nowLiked = true;
+        }
+
+        // Update card DOM directly if present
+        const card = document.getElementById(`card-${videoId}`);
+        if (card) {
+          const icon = card.querySelector('.like-icon');
+          const countEl = card.querySelector('.like-count');
+          const total = vid.likes + (nowLiked ? 1 : 0);
+          if (icon) {
+            icon.setAttribute('fill', nowLiked ? 'currentColor' : 'none');
+            icon.classList.toggle('text-[#fe2c55]', nowLiked);
+            icon.classList.toggle('text-white', !nowLiked);
+            icon.classList.toggle('scale-110', nowLiked);
+          }
+          if (countEl) {
+            countEl.textContent = formatCompactNumber(total);
+          }
+        }
+
+        updateProfileStatsUI();
+        if (state.activeNav === 'profile') renderProfileGrid();
+      }
+
+      function toggleSave(videoId) {
+        const idx = state.savedIds.indexOf(videoId);
+        let nowSaved = false;
+        if (idx === -1) {
+          state.savedIds.push(videoId);
+          nowSaved = true;
+          showToast(t('savedToast'));
+        } else {
+          state.savedIds.splice(idx, 1);
+          nowSaved = false;
+          showToast(t('unsavedToast'));
+        }
+
+        const card = document.getElementById(`card-${videoId}`);
+        if (card) {
+          const icon = card.querySelector('.save-icon');
+          if (icon) {
+            icon.setAttribute('fill', nowSaved ? 'currentColor' : 'none');
+            icon.classList.toggle('text-amber-400', nowSaved);
+            icon.classList.toggle('text-white', !nowSaved);
+          }
+        }
+        if (state.activeNav === 'profile') renderProfileGrid();
+      }
+
+      function toggleFollow(handle) {
+        if (!handle) return;
+        const idx = state.followedHandles.indexOf(handle);
+        let isNowFollowing = false;
+        if (idx === -1) {
+          state.followedHandles.push(handle);
+          isNowFollowing = true;
+          showToast(`${t('followedToast')} (${handle})`);
+        } else {
+          state.followedHandles.splice(idx, 1);
+          isNowFollowing = false;
+          showToast(`${t('unfollowedToast')} (${handle})`);
+        }
+
+        // Refresh follow buttons across visible feed cards
+        document.querySelectorAll(`[data-action="follow"][data-handle="${handle}"]`).forEach((btn) => {
+          if (btn.classList.contains('follow-badge-btn')) {
+            btn.textContent = isNowFollowing ? '✓' : '+';
+            btn.className = `follow-badge-btn -bottom-2 left-1/2 -translate-x-1/2 absolute w-5 h-5 rounded-full ${isNowFollowing ? 'bg-emerald-500 text-white' : 'bg-[#fe2c55] text-white'} flex items-center justify-center text-xs font-black shadow-md transition active:scale-90`;
+          } else {
+            btn.textContent = isNowFollowing ? t('followingBtn') : t('followBtn');
+            btn.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition ${isNowFollowing ? 'bg-white/15 border-white/25 text-white' : 'bg-[#fe2c55] border-[#fe2c55] text-white'}`;
+          }
+        });
+
+        updateProfileStatsUI();
+      }
+
+      function shareVideo(videoId) {
+        const vid = state.videos.find((v) => v.id === videoId);
+        if (!vid) return;
+        vid.shares += 1;
+
+        const card = document.getElementById(`card-${videoId}`);
+        if (card) {
+          const shareCountEl = card.querySelector('.share-count');
+          if (shareCountEl) shareCountEl.textContent = formatCompactNumber(vid.shares);
+        }
+
+        const shareUrl = `${window.location.origin}${window.location.pathname}?video=${encodeURIComponent(videoId)}`;
+
+        // Try Web Share API first if available, else copy via execCommand fallback
+        if (navigator.share) {
+          navigator.share({
+            title: `KurdTok - ${vid.handle}`,
+            text: vid.caption,
+            url: shareUrl
+          }).then(() => {
+            showToast(t('copiedToast'));
+          }).catch(() => {
+            copyFallback(shareUrl);
+          });
+        } else {
+          copyFallback(shareUrl);
+        }
+      }
+
+      function copyFallback(textToCopy) {
+        try {
+          const tempInput = document.createElement('input');
+          tempInput.value = textToCopy;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand('copy');
+          document.body.removeChild(tempInput);
+        } catch (err) {
+          // Ignore clipboard restrictions
+        }
+        showToast(t('copiedToast'));
+      }
+
+      function toggleMuteAll() {
+        state.isMuted = !state.isMuted;
+        document.querySelectorAll('video').forEach((v) => {
+          v.muted = state.isMuted;
+        });
+        document.querySelectorAll('.mute-toggle-btn').forEach((btn) => {
+          btn.innerHTML = `<span>${state.isMuted ? '🔇' : '🔊'}</span><span>${state.isMuted ? (state.lang === 'ckb' ? 'بێدەنگ' : 'Muted') : (state.lang === 'ckb' ? 'دەنگ' : 'Sound')}</span>`;
+        });
+        showToast(state.isMuted ? t('mutedToast') : t('unmutedToast'));
+      }
+
+      // =========================================================================
+      // 7. COMMENTS DRAWER LOGIC
+      // =========================================================================
+      function openCommentsModal(videoId) {
+        state.commentModalVideoId = videoId;
+        const modal = document.getElementById('commentsModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        renderCommentsList();
+        const input = document.getElementById('commentInput');
+        if (input) setTimeout(() => input.focus(), 120);
+      }
+
+      function closeCommentsModal() {
+        state.commentModalVideoId = null;
+        const modal = document.getElementById('commentsModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      function renderCommentsList() {
+        const vid = state.videos.find((v) => v.id === state.commentModalVideoId);
+        const listEl = document.getElementById('commentsList');
+        const titleEl = document.getElementById('commentsCountTitle');
+        if (!vid || !listEl || !titleEl) return;
+
+        titleEl.textContent = `${vid.comments.length} ${t('commentsWord')}`;
+
+        if (vid.comments.length === 0) {
+          listEl.innerHTML = `<div class="py-12 text-center text-xs text-zinc-500">${state.lang === 'ckb' ? 'هێشتا هیچ کۆمێنتێک نییە؛ یەکەم کەس بە!' : 'No comments yet — be the first!'}</div>`;
+          return;
+        }
+
+        listEl.innerHTML = vid.comments.map((c) => `
+          <div class="flex items-start gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#fe2c55] to-indigo-600 flex items-center justify-center text-xs font-extrabold text-white shrink-0">
+              ${escapeHtml((c.user || '@U').replace('@', '').charAt(0).toUpperCase())}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-zinc-200">${escapeHtml(c.user)}</span>
+                <span class="text-[10px] text-zinc-500">${escapeHtml(c.time)}</span>
+              </div>
+              <p class="text-xs text-zinc-100 mt-0.5 leading-relaxed break-words">${escapeHtml(c.text)}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // =========================================================================
+      // 8. DISCOVER / SEARCH VIEW LOGIC
+      // =========================================================================
+      function renderDiscoverView() {
+        const tags = ['#کوردستان', '#هەورامان', '#کوردتۆک', '#مۆسیقا', '#سروشت', '#ترێند', '#شەو'];
+        const tagsRow = document.getElementById('trendingHashtagsRow');
+        if (tagsRow) {
+          tagsRow.innerHTML = tags.map((tag) => {
+            const active = state.searchQuery.toLowerCase() === tag.toLowerCase();
+            return `
+              <button type="button" data-chip-tag="${tag}" class="discover-tag-chip px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition ${active ? 'bg-[#fe2c55] text-white' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'}">
+                ${tag}
+              </button>
+            `;
+          }).join('');
+
+          tagsRow.querySelectorAll('.discover-tag-chip').forEach((chip) => {
+            chip.addEventListener('click', () => {
+              const tag = chip.getAttribute('data-chip-tag');
+              const input = document.getElementById('discoverSearchInput');
+              if (state.searchQuery.toLowerCase() === tag.toLowerCase()) {
+                state.searchQuery = '';
+                if (input) input.value = '';
+              } else {
+                state.searchQuery = tag;
+                if (input) input.value = tag;
+              }
+              toggleClearSearchBtn();
+              renderDiscoverView();
+            });
+          });
+        }
+
+        // Featured Creators
+        const creatorsContainer = document.getElementById('creatorsListContainer');
+        if (creatorsContainer) {
+          const uniqueCreators = [];
+          const seen = new Set();
+          state.videos.forEach((v) => {
+            if (!seen.has(v.handle)) {
+              seen.add(v.handle);
+              uniqueCreators.push(v);
+            }
+          });
+
+          creatorsContainer.innerHTML = uniqueCreators.map((c) => {
+            const isFollowing = state.followedHandles.includes(c.handle);
+            return `
+              <div class="w-24 shrink-0 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 p-2.5 flex flex-col items-center text-center">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br ${c.avatarGrad} flex items-center justify-center text-base font-extrabold text-white shadow">
+                  ${escapeHtml(c.avatarLetter)}
+                </div>
+                <p class="mt-1.5 text-[11px] font-bold text-white truncate w-full">${escapeHtml(c.creatorName)}</p>
+                <p class="text-[10px] text-zinc-400 truncate w-full">${escapeHtml(c.handle)}</p>
+                <button type="button" data-creator-follow="${c.handle}" class="mt-2 w-full py-1 rounded-lg text-[10px] font-bold transition ${isFollowing ? 'bg-zinc-800 text-zinc-300' : 'bg-[#fe2c55] text-white'}">
+                  ${isFollowing ? t('followingBtn') : t('followBtn')}
+                </button>
+              </div>
+            `;
+          }).join('');
+
+          creatorsContainer.querySelectorAll('[data-creator-follow]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              toggleFollow(btn.getAttribute('data-creator-follow'));
+              renderDiscoverView();
+            });
+          });
+        }
+
+        // Filtered Videos Grid
+        const q = state.searchQuery.trim().toLowerCase();
+        const filtered = q
+          ? state.videos.filter((v) =>
+              v.caption.toLowerCase().includes(q) ||
+              v.handle.toLowerCase().includes(q) ||
+              v.creatorName.toLowerCase().includes(q) ||
+              v.sound.toLowerCase().includes(q)
+            )
+          : state.videos;
+
+        const countEl = document.getElementById('discoverResultCount');
+        if (countEl) countEl.textContent = `${filtered.length}`;
+
+        const gridEl = document.getElementById('discoverVideoGrid');
+        if (!gridEl) return;
+
+        if (filtered.length === 0) {
+          gridEl.innerHTML = `<div class="col-span-2 py-10 text-center text-xs text-zinc-500">${escapeHtml(t('noResults'))}</div>`;
+          return;
+        }
+
+        gridEl.innerHTML = filtered.map((v) => {
+          const c1 = (v.scene && v.scene.colors && v.scene.colors[1]) || '#27272a';
+          const c2 = (v.scene && v.scene.colors && v.scene.colors[2]) || '#fe2c55';
+          const emoji = (v.scene && v.scene.emoji) || '🎬';
+          return `
+            <button type="button" data-open-feed-vid="${v.id}" class="group relative aspect-[3/4] rounded-2xl overflow-hidden text-start border border-zinc-800/80 bg-zinc-900" style="background: linear-gradient(145deg, ${c1}, ${c2}66);">
+              <div class="w-full h-full flex flex-col items-center justify-center p-3">
+                <span class="text-4xl group-hover:scale-110 transition">${emoji}</span>
+              </div>
+              <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/85 via-black/45 to-transparent">
+                <p class="text-[11px] font-bold text-white line-clamp-2 leading-snug">${escapeHtml(v.caption)}</p>
+                <div class="mt-1 flex items-center justify-between text-[10px] text-zinc-300">
+                  <span>${escapeHtml(v.handle)}</span>
+                  <span>❤️ ${formatCompactNumber(v.likes)}</span>
+                </div>
+              </div>
+            </button>
+          `;
+        }).join('');
+
+        gridEl.querySelectorAll('[data-open-feed-vid]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-open-feed-vid');
+            state.feedTab = 'foryou';
+            state.activeVideoId = targetId;
+            updateFeedTabsUI();
+            switchNav('home');
+            renderVideoFeed();
+            setTimeout(() => {
+              const targetCard = document.getElementById(`card-${targetId}`);
+              if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth' });
+            }, 80);
+          });
+        });
+      }
+
+      function toggleClearSearchBtn() {
+        const input = document.getElementById('discoverSearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (!input || !clearBtn) return;
+        clearBtn.classList.toggle('hidden', input.value.trim().length === 0);
+      }
+
+      // =========================================================================
+      // 9. INBOX / ACTIVITY VIEW LOGIC
+      // =========================================================================
+      function renderInboxView() {
+        const listEl = document.getElementById('inboxListContainer');
+        if (!listEl) return;
+
+        const items = state.inboxFilter === 'all'
+          ? state.notifications
+          : state.notifications.filter((n) => n.type === state.inboxFilter);
+
+        if (items.length === 0) {
+          listEl.innerHTML = `<div class="py-12 text-center text-xs text-zinc-500">${state.lang === 'ckb' ? 'هیچ چالاکییەک لەم بەشەدا نییە' : 'No activity in this filter'}</div>`;
+          return;
+        }
+
+        listEl.innerHTML = items.map((n) => {
+          const badgeIcon = n.type === 'likes' ? '❤️' : n.type === 'comments' ? '💬' : '➕';
+          return `
+            <div data-notif-id="${n.id}" class="notif-item flex items-center gap-3 p-3 rounded-2xl border transition cursor-pointer ${n.unread ? 'bg-zinc-900 border-[#fe2c55]/40' : 'bg-zinc-900/40 border-zinc-800/60'}">
+              <div class="relative shrink-0">
+                <div class="w-11 h-11 rounded-full bg-gradient-to-br ${n.grad} flex items-center justify-center text-sm font-extrabold text-white">
+                  ${escapeHtml(n.avatar)}
+                </div>
+                <span class=" -bottom-1 -end-1 absolute w-5 h-5 rounded-full bg-zinc-950 flex items-center justify-center text-[11px]">${badgeIcon}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-zinc-100 leading-snug">
+                  <span class="font-extrabold text-white">${escapeHtml(n.actor)}</span>
+                  <span class="text-zinc-300 mx-1">${escapeHtml(state.lang === 'ckb' ? n.textCkb : n.textEn)}</span>
+                </p>
+                <p class="text-[10px] text-zinc-500 mt-1">${escapeHtml(n.time)}</p>
+              </div>
+              ${n.unread ? '<span class="w-2.5 h-2.5 rounded-full bg-[#fe2c55] shrink-0"></span>' : ''}
+            </div>
+          `;
+        }).join('');
+
+        listEl.querySelectorAll('.notif-item').forEach((el) => {
+          el.addEventListener('click', () => {
+            const nid = el.getAttribute('data-notif-id');
+            const found = state.notifications.find((item) => item.id === nid);
+            if (found) found.unread = false;
+            updateUnreadDot();
+            renderInboxView();
+          });
+        });
+      }
+
+      function updateUnreadDot() {
+        const dot = document.getElementById('inboxUnreadDot');
+        if (!dot) return;
+        const hasUnread = state.notifications.some((n) => n.unread);
+        dot.classList.toggle('hidden', !hasUnread);
+      }
+
+      // =========================================================================
+      // 10. PROFILE VIEW & BIO EDITOR LOGIC
+      // =========================================================================
+      function updateProfileStatsUI() {
+        const followingEl = document.getElementById('statFollowingCount');
+        const followersEl = document.getElementById('statFollowersCount');
+        const likesEl = document.getElementById('statLikesCount');
+        const nameEl = document.getElementById('profileDisplayName');
+        const bioEl = document.getElementById('profileBioText');
+        const avatarEl = document.getElementById('profileAvatarCircle');
+
+        if (followingEl) followingEl.textContent = formatCompactNumber(state.followedHandles.length + 22);
+        if (followersEl) followersEl.textContent = formatCompactNumber(state.profile.followers);
+        if (likesEl) likesEl.textContent = formatCompactNumber(state.profile.likes);
+        if (nameEl) nameEl.textContent = state.profile.name;
+        if (bioEl) bioEl.textContent = state.profile.bio;
+        if (avatarEl) avatarEl.textContent = (state.profile.name || 'ک').trim().charAt(0);
+      }
+
+      function renderProfileGrid() {
+        const grid = document.getElementById('profileVideosGrid');
+        if (!grid) return;
+
+        let list = [];
+        if (state.profileTab === 'uploaded') {
+          list = state.videos.filter((v) => v.isUserUpload || v.handle === state.profile.handle);
+          if (list.length === 0) {
+            // Show user's first sample clip so the tab feels lively, with an upload CTA
+            list = [state.videos[0]];
+          }
+        } else if (state.profileTab === 'liked') {
+          list = state.videos.filter((v) => state.likedIds.includes(v.id));
+        } else if (state.profileTab === 'saved') {
+          list = state.videos.filter((v) => state.savedIds.includes(v.id));
+        }
+
+        if (list.length === 0) {
+          grid.innerHTML = `<div class="col-span-3 py-10 text-center text-xs text-zinc-500">${state.lang === 'ckb' ? 'هیچ ڤیدیۆیەک لەم بەشەدا نییە' : 'Nothing here yet'}</div>`;
+          return;
+        }
+
+        grid.innerHTML = list.map((v) => {
+          const emoji = (v.scene && v.scene.emoji) || '🎬';
+          const c1 = (v.scene && v.scene.colors && v.scene.colors[1]) || '#27272a';
+          const c2 = (v.scene && v.scene.colors && v.scene.colors[2]) || '#fe2c55';
+          return `
+            <button type="button" data-profile-vid="${v.id}" class="relative aspect-[3/4] rounded-xl overflow-hidden border border-zinc-800 flex flex-col items-center justify-center p-2" style="background: linear-gradient(135deg, ${c1}, ${c2}66);">
+              <span class="text-2xl">${emoji}</span>
+              <span class="mt-1 text-[10px] font-bold text-white/90">▶ ${formatCompactNumber(v.likes)}</span>
+            </button>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('[data-profile-vid]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const vidId = btn.getAttribute('data-profile-vid');
+            state.feedTab = 'foryou';
+            state.activeVideoId = vidId;
+            updateFeedTabsUI();
+            switchNav('home');
+            renderVideoFeed();
+            setTimeout(() => {
+              const card = document.getElementById(`card-${vidId}`);
+              if (card) card.scrollIntoView({ behavior: 'smooth' });
+            }, 80);
+          });
+        });
+      }
+
+      // =========================================================================
+      // 11. UPLOAD / CREATE VIDEO MODAL LOGIC
+      // =========================================================================
+      function openUploadModal() {
+        state.uploadedMediaUrl = null;
+        state.uploadedMediaType = null;
+        state.selectedUploadScene = PRESET_SCENES[0];
+
+        const fileText = document.getElementById('selectedFileNameText');
+        if (fileText) fileText.textContent = t('uploadFileHint');
+
+        const fileInput = document.getElementById('localMediaInput');
+        if (fileInput) fileInput.value = '';
+
+        const captionInput = document.getElementById('newVideoCaption');
+        if (captionInput) captionInput.value = '';
+
+        renderPresetScenesGrid();
+        const modal = document.getElementById('uploadModal');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      function closeUploadModal() {
+        const modal = document.getElementById('uploadModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      function renderPresetScenesGrid() {
+        const grid = document.getElementById('presetSceneGrid');
+        if (!grid) return;
+
+        grid.innerHTML = PRESET_SCENES.map((sc) => {
+          const isSelected = state.selectedUploadScene && state.selectedUploadScene.id === sc.id;
+          const label = state.lang === 'ckb' ? sc.labelCkb : sc.labelEn;
+          return `
+            <button type="button" data-preset-id="${sc.id}" class="preset-scene-btn p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1 ${isSelected ? 'border-[#25f4ee] bg-zinc-800 ring-1 ring-[#25f4ee]' : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'}">
+              <span class="text-xl">${sc.emoji}</span>
+              <span class="text-[11px] font-bold text-zinc-200 truncate w-full">${escapeHtml(label)}</span>
+            </button>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('.preset-scene-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-preset-id');
+            const found = PRESET_SCENES.find((s) => s.id === id);
+            if (found) {
+              state.selectedUploadScene = found;
+              renderPresetScenesGrid();
+            }
+          });
+        });
+      }
+
+      // =========================================================================
+      // 12. NAVIGATION, LANGUAGE & PWA INSTALL PROMPT WIRING
+      // =========================================================================
+      function switchNav(navName) {
+        state.activeNav = navName;
+
+        const views = {
+          home: document.getElementById('view-home'),
+          discover: document.getElementById('view-discover'),
+          inbox: document.getElementById('view-inbox'),
+          profile: document.getElementById('view-profile')
+        };
+
+        Object.entries(views).forEach(([key, el]) => {
+          if (el) el.classList.toggle('hidden', key !== navName);
+        });
+
+        // Top header is overlaid on home feed
+        const topHeader = document.getElementById('topHeader');
+        if (topHeader) topHeader.classList.toggle('hidden', navName !== 'home');
+
+        // Bottom nav active styling
+        document.querySelectorAll('.bottom-nav-btn').forEach((btn) => {
+          const btnNav = btn.getAttribute('data-nav');
+          const active = btnNav === navName;
+          btn.classList.toggle('text-white', active);
+          btn.classList.toggle('text-zinc-400', !active);
+        });
+
+        // Pause canvas loops if leaving home view
+        canvasAnimations.forEach((ctrl) => ctrl.setPlaying(navName === 'home'));
+
+        if (navName === 'discover') {
+          renderDiscoverView();
+        } else if (navName === 'inbox') {
+          renderInboxView();
+        } else if (navName === 'profile') {
+          updateProfileStatsUI();
+          renderProfileGrid();
+        }
+      }
+
+      function updateFeedTabsUI() {
+        document.querySelectorAll('.feed-tab-btn').forEach((btn) => {
+          const tab = btn.getAttribute('data-feed-tab');
+          const isActive = tab === state.feedTab;
+          btn.classList.toggle('text-white', isActive);
+          btn.classList.toggle('font-extrabold', isActive);
+          btn.classList.toggle('text-[15px]', isActive);
+          btn.classList.toggle('text-white/65', !isActive);
+          btn.classList.toggle('font-bold', !isActive);
+          btn.classList.toggle('text-sm', !isActive);
+
+          const indicator = btn.querySelector('.active-indicator');
+          if (indicator) indicator.classList.toggle('hidden', !isActive);
+        });
+      }
+
+      function applyLanguage() {
+        const htmlEl = document.documentElement;
+        htmlEl.setAttribute('lang', state.lang === 'ckb' ? 'ckb' : 'en');
+        htmlEl.setAttribute('dir', t('dir'));
+
+        const setText = (id, text) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = text;
+        };
+
+        setText('langBadgeText', t('langBadge'));
+        setText('installBtnLabel', t('installBtn'));
+        setText('pwaBannerTitle', t('pwaTitle'));
+        setText('pwaBannerDesc', t('pwaDesc'));
+        setText('pwaInstallActionLabel', t('pwaInstallAction'));
+        setText('navHintText', t('navHint'));
+        setText('discoverTitle', t('discoverTitle'));
+        setText('discoverBannerTitle', t('discoverBannerTitle'));
+        setText('discoverBannerSub', t('discoverBannerSub'));
+        setText('popularCreatorsTitle', t('popularCreators'));
+        setText('discoverGridTitle', t('curatedVideos'));
+        setText('inboxTitle', t('inboxTitle'));
+        setText('markAllReadLabel', t('markAllRead'));
+        setText('editProfileLabel', t('editProfile'));
+        setText('statFollowingLabel', t('statFollowing'));
+        setText('statFollowersLabel', t('statFollowers'));
+        setText('statLikesLabel', t('statLikes'));
+        setText('bioInputLabel', t('bioInputLabel'));
+        setText('cancelBioBtn', t('cancel'));
+        setText('saveBioBtn', t('save'));
+        setText('pwaCardTitle', t('pwaCardTitle'));
+        setText('pwaCardStatusText', t('pwaCardStatus'));
+        setText('profileInstallBtnText', t('downloadApp'));
+        setText('postCommentBtnText', t('postComment'));
+        setText('uploadModalTitle', t('uploadTitle'));
+        setText('uploadFileLabel', t('uploadFileLabel'));
+        setText('selectedFileNameText', t('uploadFileHint'));
+        setText('presetSceneLabel', t('presetLabel'));
+        setText('captionInputLabel', t('captionLabel'));
+        setText('soundInputLabel', t('soundLabel'));
+        setText('publishVideoBtnText', t('publishBtn'));
+
+        const searchInput = document.getElementById('discoverSearchInput');
+        if (searchInput) searchInput.placeholder = t('searchPlaceholder');
+
+        const commentInput = document.getElementById('commentInput');
+        if (commentInput) commentInput.placeholder = t('commentPlaceholder');
+
+        document.querySelectorAll('.tab-label-following').forEach((el) => (el.textContent = t('following')));
+        document.querySelectorAll('.tab-label-foryou').forEach((el) => (el.textContent = t('forYou')));
+        document.querySelectorAll('.tab-label-explore').forEach((el) => (el.textContent = t('explore')));
+
+        document.querySelectorAll('.nav-label-home').forEach((el) => (el.textContent = t('navHome')));
+        document.querySelectorAll('.nav-label-discover').forEach((el) => (el.textContent = t('navDiscover')));
+        document.querySelectorAll('.nav-label-inbox').forEach((el) => (el.textContent = t('navInbox')));
+        document.querySelectorAll('.nav-label-profile').forEach((el) => (el.textContent = t('navProfile')));
+
+        document.querySelectorAll('.inbox-f-all').forEach((el) => (el.textContent = t('filterAll')));
+        document.querySelectorAll('.inbox-f-likes').forEach((el) => (el.textContent = t('filterLikes')));
+        document.querySelectorAll('.inbox-f-comments').forEach((el) => (el.textContent = t('filterComments')));
+        document.querySelectorAll('.inbox-f-follows').forEach((el) => (el.textContent = t('filterFollows')));
+
+        document.querySelectorAll('.p-tab-uploaded').forEach((el) => (el.textContent = t('tabUploaded')));
+        document.querySelectorAll('.p-tab-liked').forEach((el) => (el.textContent = t('tabLiked')));
+        document.querySelectorAll('.p-tab-saved').forEach((el) => (el.textContent = t('tabSaved')));
+
+        // Re-render current view so dynamic strings update cleanly
+        if (state.activeNav === 'home') renderVideoFeed();
+        else if (state.activeNav === 'discover') renderDiscoverView();
+        else if (state.activeNav === 'inbox') renderInboxView();
+        else if (state.activeNav === 'profile') {
+          updateProfileStatsUI();
+          renderProfileGrid();
+        }
+      }
+
+      async function triggerPWAInstall() {
+        if (state.deferredInstallPrompt) {
+          state.deferredInstallPrompt.prompt();
+          const choice = await state.deferredInstallPrompt.userChoice;
+          state.deferredInstallPrompt = null;
+          const banner = document.getElementById('pwaBanner');
+          if (banner) banner.classList.add('hidden');
+          if (choice && choice.outcome === 'accepted') {
+            showToast(t('pwaInstalledToast'));
+          }
+        } else {
+          showToast(t('pwaManualHint'));
+        }
+      }
+
+      function bindGlobalEvents() {
+        // Language Toggle
+        document.getElementById('langToggleBtn')?.addEventListener('click', () => {
+          state.lang = state.lang === 'ckb' ? 'en' : 'ckb';
+          applyLanguage();
+        });
+
+        // Header Search Button -> Discover
+        document.getElementById('headerSearchBtn')?.addEventListener('click', () => {
+          switchNav('discover');
+          setTimeout(() => document.getElementById('discoverSearchInput')?.focus(), 100);
+        });
+
+        // Feed Tabs (Following / For You / Explore)
+        document.querySelectorAll('.feed-tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.feedTab = btn.getAttribute('data-feed-tab');
+            updateFeedTabsUI();
+            renderVideoFeed();
+            const feedCont = document.getElementById('videoFeedContainer');
+            if (feedCont) feedCont.scrollTop = 0;
+          });
+        });
+
+        // Bottom Navigation
+        document.querySelectorAll('.bottom-nav-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const nav = btn.getAttribute('data-nav');
+            if (nav) switchNav(nav);
+          });
+        });
+
+        // Keyboard Up / Down navigation on Home Feed
+        window.addEventListener('keydown', (e) => {
+          if (state.activeNav !== 'home') return;
+          if (!document.getElementById('commentsModal')?.classList.contains('hidden')) return;
+          if (!document.getElementById('uploadModal')?.classList.contains('hidden')) return;
+
+          const container = document.getElementById('videoFeedContainer');
+          if (!container) return;
+          const h = container.clientHeight || window.innerHeight;
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            container.scrollBy({ top: h, behavior: 'smooth' });
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            container.scrollBy({ top: -h, behavior: 'smooth' });
+          }
+        });
+
+        // PWA Install Buttons & Banner
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          state.deferredInstallPrompt = e;
+          const banner = document.getElementById('pwaBanner');
+          if (banner) banner.classList.remove('hidden');
+        });
+
+        window.addEventListener('appinstalled', () => {
+          state.deferredInstallPrompt = null;
+          document.getElementById('pwaBanner')?.classList.add('hidden');
+          showToast(t('pwaInstalledToast'));
+        });
+
+        document.getElementById('pwaInstallHeaderBtn')?.addEventListener('click', () => {
+          const banner = document.getElementById('pwaBanner');
+          if (state.deferredInstallPrompt) {
+            triggerPWAInstall();
+          } else if (banner) {
+            banner.classList.toggle('hidden');
+          }
+        });
+
+        document.getElementById('pwaConfirmInstallBtn')?.addEventListener('click', triggerPWAInstall);
+        document.getElementById('profileInstallPwaBtn')?.addEventListener('click', triggerPWAInstall);
+        document.getElementById('pwaDismissBannerBtn')?.addEventListener('click', () => {
+          document.getElementById('pwaBanner')?.classList.add('hidden');
+        });
+
+        // Comments Modal Events
+        document.getElementById('closeCommentsBtn')?.addEventListener('click', closeCommentsModal);
+        document.getElementById('commentsBackdrop')?.addEventListener('click', closeCommentsModal);
+
+        document.querySelectorAll('.quick-emoji').forEach((emojiBtn) => {
+          emojiBtn.addEventListener('click', () => {
+            const input = document.getElementById('commentInput');
+            if (input) {
+              input.value = (input.value + ' ' + emojiBtn.textContent.trim()).trim();
+              input.focus();
+            }
+          });
+        });
+
+        document.getElementById('commentForm')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const input = document.getElementById('commentInput');
+          const vid = state.videos.find((v) => v.id === state.commentModalVideoId);
+          if (!input || !vid) return;
+
+          const text = input.value.trim();
+          if (!text) return;
+
+          vid.comments.push({
+            id: 'c_' + Date.now(),
+            user: state.profile.handle,
+            text,
+            time: state.lang === 'ckb' ? 'ئێستا' : 'Just now'
+          });
+
+          input.value = '';
+          renderCommentsList();
+
+          // Update comment count on card
+          const card = document.getElementById(`card-${vid.id}`);
+          if (card) {
+            const countEl = card.querySelector('.comment-count');
+            if (countEl) countEl.textContent = formatCompactNumber(vid.comments.length);
+          }
+        });
+
+        // Upload Modal Events
+        document.getElementById('openUploadModalBtn')?.addEventListener('click', openUploadModal);
+        document.getElementById('closeUploadBtn')?.addEventListener('click', closeUploadModal);
+        document.getElementById('uploadBackdrop')?.addEventListener('click', closeUploadModal);
+
+        document.getElementById('localMediaInput')?.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          state.uploadedMediaUrl = URL.createObjectURL(file);
+          state.uploadedMediaType = file.type || '';
+          const labelEl = document.getElementById('selectedFileNameText');
+          if (labelEl) labelEl.textContent = `📎 ${file.name}`;
+        });
+
+        document.getElementById('uploadVideoForm')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const captionInput = document.getElementById('newVideoCaption');
+          const soundInput = document.getElementById('newVideoSound');
+          const caption = captionInput ? captionInput.value.trim() : '';
+          if (!caption) return;
+
+          const newVid = {
+            id: 'vid_' + Date.now(),
+            creatorName: state.profile.name,
+            handle: state.profile.handle,
+            avatarLetter: (state.profile.name || 'ک').trim().charAt(0),
+            avatarGrad: 'from-[#fe2c55] to-[#25f4ee]',
+            verified: true,
+            caption,
+            sound: (soundInput && soundInput.value.trim()) || 'Original Sound - KurdTok',
+            likes: 1,
+            comments: [],
+            shares: 0,
+            scene: state.selectedUploadScene || PRESET_SCENES[0],
+            mediaUrl: state.uploadedMediaUrl,
+            mediaType: state.uploadedMediaType,
+            category: 'foryou',
+            isUserUpload: true
+          };
+
+          state.videos.unshift(newVid);
+          state.feedTab = 'foryou';
+          state.activeVideoId = newVid.id;
+          closeUploadModal();
+          updateFeedTabsUI();
+          switchNav('home');
+          renderVideoFeed();
+          const feedCont = document.getElementById('videoFeedContainer');
+          if (feedCont) feedCont.scrollTop = 0;
+          showToast(t('publishedToast'));
+        });
+
+        // Discover Search Input
+        const searchInput = document.getElementById('discoverSearchInput');
+        searchInput?.addEventListener('input', (e) => {
+          state.searchQuery = e.target.value;
+          toggleClearSearchBtn();
+          renderDiscoverView();
+        });
+
+        document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
+          state.searchQuery = '';
+          toggleClearSearchBtn();
+          renderDiscoverView();
+        });
+
+        // Inbox Filters & Mark All Read
+        document.querySelectorAll('.inbox-filter-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.inboxFilter = btn.getAttribute('data-inbox-filter');
+            document.querySelectorAll('.inbox-filter-btn').forEach((b) => {
+              const active = b === btn;
+              b.className = `inbox-filter-btn px-3 py-1.5 rounded-full text-xs font-bold transition ${active ? 'bg-white text-zinc-950' : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 font-semibold'}`;
+            });
+            renderInboxView();
+          });
+        });
+
+        document.getElementById('markAllReadBtn')?.addEventListener('click', () => {
+          state.notifications.forEach((n) => (n.unread = false));
+          updateUnreadDot();
+          renderInboxView();
+        });
+
+        // Profile Tabs & Bio Editor
+        document.querySelectorAll('.profile-tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.profileTab = btn.getAttribute('data-profile-tab');
+            document.querySelectorAll('.profile-tab-btn').forEach((b) => {
+              const active = b === btn;
+              b.className = `profile-tab-btn py-2.5 text-xs flex items-center justify-center gap-1 border-b-2 transition ${active ? 'font-extrabold text-white border-[#fe2c55]' : 'font-semibold text-zinc-400 hover:text-white border-transparent'}`;
+            });
+            renderProfileGrid();
+          });
+        });
+
+        document.getElementById('profileEditBioBtn')?.addEventListener('click', () => {
+          const box = document.getElementById('bioEditorBox');
+          const nameInp = document.getElementById('editNameInput');
+          const bioInp = document.getElementById('editBioInput');
+          if (!box) return;
+          box.classList.toggle('hidden');
+          if (!box.classList.contains('hidden')) {
+            if (nameInp) nameInp.value = state.profile.name;
+            if (bioInp) bioInp.value = state.profile.bio;
+          }
+        });
+
+        document.getElementById('cancelBioBtn')?.addEventListener('click', () => {
+          document.getElementById('bioEditorBox')?.classList.add('hidden');
+        });
+
+        document.getElementById('saveBioBtn')?.addEventListener('click', () => {
+          const nameInp = document.getElementById('editNameInput');
+          const bioInp = document.getElementById('editBioInput');
+          if (nameInp && nameInp.value.trim()) state.profile.name = nameInp.value.trim();
+          if (bioInp && bioInp.value.trim()) state.profile.bio = bioInp.value.trim();
+          document.getElementById('bioEditorBox')?.classList.add('hidden');
+          updateProfileStatsUI();
+          showToast(state.lang === 'ckb' ? 'پڕۆفایل نوێکرایەوە ✓' : 'Profile updated ✓');
+        });
+
+        // Resize listener to keep active canvas crisp
+        window.addEventListener('resize', () => {
+          if (state.activeNav === 'home') {
+            renderVideoFeed();
+          }
+        });
+      }
+
+      // =========================================================================
+      // 13. INITIALIZATION
+      // =========================================================================
+      window.addEventListener('DOMContentLoaded', () => {
+        setupPWA();
+        bindGlobalEvents();
+        updateUnreadDot();
+        applyLanguage();
+
+        // Briefly show swipe/keyboard hint pill on initial load
+        const hintPill = document.getElementById('navHintPill');
+        if (hintPill) {
+          hintPill.classList.remove('hidden');
+          setTimeout(() => hintPill.classList.add('hidden'), 3800);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
+```
